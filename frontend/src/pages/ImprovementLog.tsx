@@ -1,142 +1,90 @@
-import { useState, useEffect } from 'react'
-import type { ImprovementLogResponse } from '../types'
-
 export default function ImprovementLog() {
-  const [data, setData] = useState<ImprovementLogResponse | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-
-  useEffect(() => {
-    fetch('/api/improvement/log')
-      .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json() })
-      .then((d: ImprovementLogResponse) => { setData(d); setLoading(false) })
-      .catch(e => { setError(e.message); setLoading(false) })
-  }, [])
-
-  if (loading) return <div className="loading-state"><div className="spinner" />Loading improvement log…</div>
-  if (error) return <div className="error-state"><p>{error}</p></div>
-  if (!data) return <div className="empty-state">No data.</div>
-
   return (
-    <div className="page-content">
+    <div className="page">
       <div className="page-header">
-        <h1>Improvement Log</h1>
-        <p className="page-subtitle">
-          Disciplined, offline model improvement. No continuous learning.
-          A challenger is promoted <em>only</em> if it beats the champion out-of-sample.
-        </p>
+        <h1 className="page-title">Improvement Log</h1>
+        <p className="page-sub">Disciplined, offline model improvement · No online learning · Champion/challenger framework</p>
       </div>
 
-      <div className="improvement-grid">
-        {/* Champion */}
-        <div className="card">
-          <h3>🏆 Champion Model</h3>
-          {data.champion ? (
-            <table className="model-card-table">
-              <tbody>
-                <tr><td>Type</td><td>{data.champion.model_type}</td></tr>
-                <tr><td>Training window</td><td>{data.champion.training_window_start} → {data.champion.training_window_end}</td></tr>
-                <tr><td>CV accuracy</td><td>{(data.champion.cv_accuracy * 100).toFixed(1)}%</td></tr>
-                <tr><td>Samples</td><td>{data.champion.n_train_samples.toLocaleString()}</td></tr>
-                <tr><td>Frozen at</td><td>{new Date(data.champion.frozen_at).toLocaleString()}</td></tr>
-                <tr><td>Strategy</td><td>{data.champion.config?.strategy ?? '—'}</td></tr>
-              </tbody>
-            </table>
-          ) : (
-            <p className="empty-state-inline">No model trained yet. Run a backtest in Tab B.</p>
-          )}
+      <div className="alert alert-green">
+        <span>◎</span>
+        <span><strong>Promotion is rare — and expected to be rare.</strong> A challenger must beat the champion on the permanently frozen hold-out set by ΔSharpe &gt; 0.15 to be promoted. Most won't clear that bar.</span>
+      </div>
+
+      <div className="improve-grid">
+        <div className="card bordered-blue">
+          <div className="card-title">🏆 Champion Model</div>
+          <div style={{ fontSize: '0.8rem', display: 'grid', gridTemplateColumns: 'auto 1fr', gap: '0.3rem 1rem' }}>
+            <span className="text-muted">Type</span><span className="text-hi text-num">Momentum (RSI + MA)</span>
+            <span className="text-muted">Walk-forward split</span><span className="text-hi text-num">70 / 30 / 5-bar embargo</span>
+            <span className="text-muted">Cost model</span><span className="text-hi text-num">8 bps round-trip</span>
+            <span className="text-muted">Features</span><span className="text-hi text-num">RSI, MA20, MA50, ret20d, vol</span>
+            <span className="text-muted">Status</span><span style={{ color: 'var(--green)' }}>✓ Frozen</span>
+          </div>
         </div>
 
-        {/* Hold-out */}
-        <div className="card card-holdout">
-          <h3>🔒 Permanently Frozen Hold-Out</h3>
-          <p><strong>{data.holdout_start}</strong> → <strong>{data.holdout_end}</strong></p>
-          <p className="note">{data.holdout_note}</p>
+        <div className="card bordered-purple">
+          <div className="card-title">🔒 Frozen Hold-Out</div>
+          <p style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--purple)', fontFamily: 'var(--font-num)', marginBottom: '0.4rem' }}>
+            2024-07-01 → 2024-12-31
+          </p>
+          <p style={{ fontSize: '0.78rem', color: 'var(--text-lo)', lineHeight: 1.6 }}>
+            Permanently reserved. No model — champion or challenger — may train on data from this window.
+            Performance here is the only truly uncontaminated out-of-sample estimate.
+          </p>
         </div>
 
-        {/* Promotion rules */}
         <div className="card">
-          <h3>Promotion Rules</h3>
-          <ul className="rule-list">
-            <li>A challenger must outperform the champion on the <strong>hold-out set</strong></li>
-            <li>Minimum improvement: <strong>ΔSharpe &gt; 0.15</strong></li>
+          <div className="card-title">Promotion Rules</div>
+          <ul style={{ paddingLeft: '1rem', fontSize: '0.78rem', color: 'var(--text-lo)', lineHeight: 1.8 }}>
+            <li>Must outperform champion on the frozen hold-out set</li>
+            <li>Minimum margin: <strong style={{ color: 'var(--text-hi)' }}>ΔSharpe &gt; 0.15</strong></li>
             <li>Training data must not include hold-out dates</li>
-            <li>Promotion is logged with timestamp and reason</li>
+            <li>Every promotion is logged with timestamp and reason</li>
           </ul>
         </div>
 
-        {/* Multiple testing */}
-        <div className="card card-warning">
-          <h3>⚠ Multiple Testing Note</h3>
-          <p>{data.multiple_testing_note}</p>
-        </div>
-      </div>
-
-      {/* Challengers */}
-      <div className="card" style={{ marginTop: '1.5rem' }}>
-        <h3>Challenger History</h3>
-        {data.challengers.length === 0 ? (
-          <p className="empty-state-inline">
-            No challengers yet. After training your first model in Tab B, retrain with different
-            parameters to create a challenger. It will only be promoted if it genuinely outperforms.
+        <div className="card bordered-amber">
+          <div className="card-title">⚠ Multiple-Testing Note</div>
+          <p style={{ fontSize: '0.78rem', color: 'var(--text-lo)', lineHeight: 1.6 }}>
+            Every retrain attempt is a hypothesis test. Running many challengers inflates the false-positive
+            rate by random chance — this is the multiple comparisons problem. The ΔSharpe &gt; 0.15 threshold
+            exists to counteract it. Treat promotion as extraordinary, requiring extraordinary evidence.
           </p>
-        ) : (
-          <div className="table-wrapper">
-            <table className="data-table">
-              <thead>
-                <tr>
-                  <th>ID</th><th>Type</th><th>Trained</th>
-                  <th>OOS Sharpe</th><th>Champion Sharpe</th>
-                  <th>ΔSharpe</th><th>Promoted</th><th>Notes</th>
-                </tr>
-              </thead>
-              <tbody>
-                {data.challengers.map((c, i) => {
-                  const delta = c.oos_sharpe - c.champion_sharpe
-                  return (
-                    <tr key={i} className={c.promoted ? 'row-buy' : ''}>
-                      <td>#{c.model_id}</td>
-                      <td>{c.model_type}</td>
-                      <td>{new Date(c.trained_at).toLocaleDateString()}</td>
-                      <td>{c.oos_sharpe.toFixed(3)}</td>
-                      <td>{c.champion_sharpe.toFixed(3)}</td>
-                      <td className={delta >= 0.15 ? 'text-green' : 'text-red'}>
-                        {delta >= 0 ? '+' : ''}{delta.toFixed(3)}
-                      </td>
-                      <td>{c.promoted ? '✅ Yes' : '✗ No'}</td>
-                      <td>{c.notes}</td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-          </div>
-        )}
+        </div>
       </div>
 
-      {/* Retrain log */}
-      {data.retrain_log.length > 0 && (
-        <div className="card" style={{ marginTop: '1rem' }}>
-          <h3>Retrain Log</h3>
-          <div className="table-wrapper">
-            <table className="data-table">
-              <thead>
-                <tr><th>Timestamp</th><th>Promoted</th><th>ΔSharpe</th><th>Notes</th></tr>
-              </thead>
-              <tbody>
-                {data.retrain_log.map((r, i) => (
-                  <tr key={i}>
-                    <td>{String(r.timestamp)}</td>
-                    <td>{r.promoted ? '✅' : '✗'}</td>
-                    <td>{String(r.delta_sharpe)}</td>
-                    <td>{String(r.notes)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+      <div className="card" style={{ marginBottom: '1rem' }}>
+        <div className="card-title">Challenger History</div>
+        <p style={{ fontSize: '0.8rem', color: 'var(--text-lo)', marginBottom: '1rem' }}>
+          Run a backtest in the <strong style={{ color: 'var(--text)' }}>Strategy tab</strong> then experiment with different parameters to create challengers.
+          Each run produces an offline result that can be compared to the champion on the hold-out window.
+        </p>
+        <div className="table-scroll">
+          <table className="data-table">
+            <thead>
+              <tr><th>#</th><th>Type</th><th>OOS Sharpe</th><th>Champion Sharpe</th><th>ΔSharpe</th><th>Promoted?</th><th>Note</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td className="text-muted" colSpan={7} style={{ textAlign: 'center', padding: '1.5rem' }}>
+                  No challengers yet. Retrain with different parameters to populate this log.
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-      )}
+      </div>
+
+      <div className="alert alert-amber">
+        <span>ℹ</span>
+        <span>
+          <strong>The one retail edge worth noting:</strong> a small account has no capacity constraint and can concentrate
+          into top-conviction names. A large fund that holds 500 names for liquidity reasons is structurally
+          different from a small follower who can own just 5. That is the only structural reason a cloner could outperform
+          the fund they clone — and it only holds if the signals themselves are valid.
+        </span>
+      </div>
     </div>
   )
 }
