@@ -4,6 +4,8 @@ import SmartMoney from './pages/SmartMoney'
 import Backtest from './pages/Backtest'
 import Simulation from './pages/Simulation'
 import ImprovementLog from './pages/ImprovementLog'
+import HumanSimulator from './pages/HumanSimulator'
+import LearningEnginePage from './pages/LearningEngine'
 
 function Nav() {
   return (
@@ -18,6 +20,8 @@ function Nav() {
           ['/backtest', 'Backtest'],
           ['/simulation', 'Simulation'],
           ['/improvement', 'Improvement Log'],
+          ['/simulator', 'Simulator'],
+          ['/learning', 'Learning Engine'],
         ] as [string, string][]
       ).map(([to, label]) => (
         <NavLink
@@ -61,6 +65,8 @@ export default function App() {
               <Route path="/backtest" element={<Backtest />} />
               <Route path="/simulation" element={<Simulation />} />
               <Route path="/improvement" element={<ImprovementLog />} />
+              <Route path="/simulator" element={<HumanSimulator />} />
+              <Route path="/learning" element={<LearningEnginePage />} />
             </Routes>
           </ErrorBoundary>
         </main>

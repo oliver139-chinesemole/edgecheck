@@ -10,6 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.config import get_settings
 from app.database import init_db
 from app.api import health, smart_money, backtest, simulation, improvement
+from app.api import human_sim, agent
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -51,6 +52,8 @@ app.include_router(smart_money.router, prefix="/api/smart-money")
 app.include_router(backtest.router, prefix="/api/backtest")
 app.include_router(simulation.router, prefix="/api/simulation")
 app.include_router(improvement.router, prefix="/api/improvement")
+app.include_router(human_sim.router, prefix="/api/sim")
+app.include_router(agent.router, prefix="/api/agent")
 
 
 @app.get("/")

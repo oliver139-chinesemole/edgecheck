@@ -2,6 +2,8 @@
 SQLAlchemy setup and DB seed logic.
 The DB is seeded from CSVs in /data on first run if empty.
 """
+from __future__ import annotations
+
 import logging
 from pathlib import Path
 from sqlalchemy import create_engine, Column, String, Float, Integer, DateTime, text
@@ -41,6 +43,35 @@ class RetrainLogRecord(Base):
     champion_sharpe = Column(Float, nullable=False)
     promoted = Column(Integer, default=0)
     notes = Column(String, default="")
+
+
+class SimSessionRecord(Base):
+    __tablename__ = "sim_sessions"
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    session_id = Column(String, nullable=False, unique=True)
+    created_at = Column(String, nullable=False)
+    final_equity = Column(Float, nullable=False)
+    n_trades = Column(Integer, nullable=False, default=0)
+    notes = Column(String, default="")
+
+
+class SimOrderRecord(Base):
+    __tablename__ = "sim_orders"
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    order_id = Column(String, nullable=False, unique=True)
+    session_id = Column(String, nullable=False)
+    ticker = Column(String, nullable=False)
+    side = Column(String, nullable=False)     # buy/sell/short/cover
+    order_type = Column(String, nullable=False)  # market/limit/stop
+    qty = Column(Float, nullable=False)
+    limit_price = Column(Float, nullable=True)
+    stop_price = Column(Float, nullable=True)
+    status = Column(String, nullable=False)   # pending/filled/cancelled/rejected
+    submitted_at = Column(String, nullable=False)
+    filled_at = Column(String, nullable=True)
+    fill_price = Column(Float, nullable=True)
+    fill_qty = Column(Float, nullable=True)
+    message = Column(String, default="")
 
 
 _engine = None

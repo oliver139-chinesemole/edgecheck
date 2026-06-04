@@ -80,6 +80,31 @@ Check items off as they are verified working. "Done" = app runs end-to-end on mo
 
 ---
 
+## Feature A — Human Trading Simulator (in progress)
+
+- [ ] `backend/app/services/sim_core.py` — SimCore: submit_order, update_prices, get_portfolio, reset
+- [ ] `backend/app/services/replay_engine.py` — ReplayEngine: run_episode, run_many_episodes
+- [ ] `backend/app/api/human_sim.py` — REST + WebSocket endpoints
+- [ ] DB tables: sim_sessions, sim_orders (database.py)
+- [ ] `frontend/src/hooks/useWebSocket.ts` — WS hook with exponential backoff
+- [ ] `frontend/src/pages/HumanSimulator.tsx` — order entry, equity chart, positions, watchlist
+
+## Feature B — Background Learning Engine (in progress)
+
+- [ ] `backend/app/services/learning_engine.py` — LearningEngine: start/stop/get_status, champion harness
+- [ ] `backend/app/api/agent.py` — GET /status, POST /start, POST /stop, GET /champion
+- [ ] `frontend/src/pages/LearningEngine.tsx` — status, champion card, honest result panel
+
+## Routing update (in progress)
+
+- [ ] Add /simulator and /learning routes to App.tsx
+
+## New tests (in progress)
+
+- [ ] `tests/test_sim_core.py` — buy/sell, costs, short, reset, replay, frozen champion
+
+---
+
 ## Tests (✅ written, verify pass with `make test`)
 
 - [x] `test_backtest_no_lookahead.py` — 3 assertions covering lookahead vectors
