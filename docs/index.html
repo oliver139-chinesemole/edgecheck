@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EdgeCheck — Smart Money Research Platform</title>
+  <meta name="description" content="Rigorously test whether following institutional smart money has any durable edge. Leakage-free backtests, frozen models, honest results." />
+  <style>
+    :root {
+      --bg: #0a0d14;
+      --bg2: #111827;
+      --bg3: #1f2937;
+      --border: #2d3748;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --accent: #3b82f6;
+      --accent2: #6366f1;
+      --green: #22c55e;
+      --yellow: #f59e0b;
+      --red: #ef4444;
+      --radius: 10px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', sans-serif;
+      font-size: 16px;
+      line-height: 1.7;
+    }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* ─── NAV ─────────────────────────────────────────────────────── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(10, 13, 20, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0.9rem 2rem;
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+    }
+    .nav-brand {
+      font-weight: 800;
+      font-size: 1.15rem;
+      background: linear-gradient(90deg, #3b82f6, #6366f1);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.02em;
+    }
+    .nav-links { display: flex; gap: 1.5rem; }
+    .nav-links a { color: var(--muted); font-size: 0.9rem; }
+    .nav-links a:hover { color: var(--text); text-decoration: none; }
+    .nav-spacer { flex: 1; }
+    .btn-nav {
+      padding: 0.4rem 1rem;
+      background: var(--accent);
+      border: none;
+      border-radius: 6px;
+      color: #fff;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .btn-nav:hover { background: #2563eb; text-decoration: none; }
+
+    /* ─── HERO ────────────────────────────────────────────────────── */
+    .hero {
+      min-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 4rem 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 70% 50% at 50% 0%, rgba(59,130,246,0.12) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 40% at 80% 60%, rgba(99,102,241,0.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .disclaimer-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.3rem 0.9rem;
+      background: rgba(245,158,11,0.12);
+      border: 1px solid rgba(245,158,11,0.35);
+      border-radius: 99px;
+      color: var(--yellow);
+      font-size: 0.78rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 1.75rem;
+    }
+
+    h1 {
+      font-size: clamp(2.4rem, 6vw, 4.5rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      margin-bottom: 1.5rem;
+      max-width: 820px;
+    }
+    h1 em {
+      font-style: normal;
+      background: linear-gradient(90deg, #3b82f6, #6366f1);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-sub {
+      font-size: clamp(1rem, 2.5vw, 1.2rem);
+      color: var(--muted);
+      max-width: 600px;
+      margin-bottom: 2.5rem;
+    }
+
+    .hero-cta {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .btn-primary {
+      padding: 0.75rem 1.75rem;
+      background: var(--accent);
+      border: none;
+      border-radius: var(--radius);
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.15s, transform 0.1s;
+    }
+    .btn-primary:hover { background: #2563eb; transform: translateY(-1px); text-decoration: none; }
+
+    .btn-secondary {
+      padding: 0.75rem 1.75rem;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text);
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: border-color 0.15s;
+    }
+    .btn-secondary:hover { border-color: var(--accent); text-decoration: none; }
+
+    /* ─── HONEST RESULT BANNER ────────────────────────────────────── */
+    .honest-banner {
+      background: rgba(34,197,94,0.07);
+      border: 1px solid rgba(34,197,94,0.2);
+      border-radius: var(--radius);
+      padding: 1.25rem 2rem;
+      max-width: 700px;
+      margin: 3rem auto 0;
+      text-align: center;
+      color: #86efac;
+      font-size: 0.95rem;
+    }
+    .honest-banner strong { color: var(--green); }
+
+    /* ─── SECTION WRAPPER ─────────────────────────────────────────── */
+    section {
+      padding: 5rem 2rem;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .section-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--accent);
+      margin-bottom: 0.75rem;
+    }
+    .section-title {
+      font-size: clamp(1.7rem, 4vw, 2.6rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 1rem;
+    }
+    .section-sub {
+      color: var(--muted);
+      max-width: 580px;
+      margin-bottom: 3.5rem;
+      font-size: 1.05rem;
+    }
+
+    /* ─── TABS FEATURE GRID ───────────────────────────────────────── */
+    .tabs-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .tab-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      transition: border-color 0.2s, transform 0.15s;
+    }
+    .tab-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+
+    .tab-icon {
+      width: 44px; height: 44px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem;
+      margin-bottom: 1rem;
+    }
+    .icon-a { background: rgba(59,130,246,0.15); }
+    .icon-b { background: rgba(99,102,241,0.15); }
+    .icon-c { background: rgba(34,197,94,0.15); }
+    .icon-d { background: rgba(245,158,11,0.15); }
+
+    .tab-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem; }
+    .tab-card p { color: var(--muted); font-size: 0.875rem; line-height: 1.6; }
+
+    /* ─── METHODOLOGY ─────────────────────────────────────────────── */
+    .method-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1rem;
+    }
+
+    .method-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem 1.5rem;
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+    }
+
+    .method-check {
+      width: 26px; height: 26px;
+      border-radius: 50%;
+      background: rgba(34,197,94,0.15);
+      border: 1px solid rgba(34,197,94,0.3);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      font-size: 0.8rem;
+      color: var(--green);
+    }
+
+    .method-card h4 { font-size: 0.9rem; font-weight: 700; margin-bottom: 0.25rem; }
+    .method-card p { color: var(--muted); font-size: 0.8rem; }
+
+    /* ─── INSTALL ─────────────────────────────────────────────────── */
+    #install {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 3rem;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .code-block {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem 1.5rem;
+      font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+      font-size: 0.875rem;
+      color: #93c5fd;
+      overflow-x: auto;
+      margin: 1rem 0;
+      position: relative;
+    }
+    .code-comment { color: var(--muted); }
+    .code-cmd { color: #a5f3fc; }
+    .code-green { color: var(--green); }
+
+    .install-steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    .install-step {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem;
+      font-size: 0.85rem;
+    }
+    .install-step .step-num {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--accent);
+      line-height: 1;
+      margin-bottom: 0.5rem;
+    }
+    .install-step h4 { font-size: 0.85rem; margin-bottom: 0.25rem; }
+    .install-step p { color: var(--muted); font-size: 0.78rem; }
+
+    /* ─── KEYS SECTION ────────────────────────────────────────────── */
+    .keys-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+      margin-top: 2rem;
+    }
+    @media (max-width: 600px) { .keys-grid { grid-template-columns: 1fr; } }
+
+    .key-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+    }
+    .key-card .key-status {
+      display: inline-flex;
+      gap: 0.35rem;
+      align-items: center;
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      margin-bottom: 0.75rem;
+    }
+    .status-optional { background: rgba(99,102,241,0.15); color: #a5b4fc; }
+    .status-free { background: rgba(34,197,94,0.1); color: var(--green); }
+    .key-card h4 { font-size: 0.9rem; font-weight: 700; margin-bottom: 0.35rem; }
+    .key-card p { color: var(--muted); font-size: 0.8rem; }
+
+    /* ─── FOOTER ──────────────────────────────────────────────────── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2.5rem 2rem;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+    .footer-inner { max-width: 700px; margin: 0 auto; }
+    .footer-disclaimer {
+      background: rgba(245,158,11,0.08);
+      border: 1px solid rgba(245,158,11,0.2);
+      border-radius: var(--radius);
+      padding: 1rem 1.5rem;
+      color: var(--yellow);
+      font-size: 0.8rem;
+      margin-bottom: 1.5rem;
+      text-align: left;
+    }
+
+    /* ─── DIVIDER ─────────────────────────────────────────────────── */
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    /* ─── RESPONSIVE ──────────────────────────────────────────────── */
+    @media (max-width: 640px) {
+      nav .nav-links { display: none; }
+      #install { padding: 2rem 1.25rem; }
+      section { padding: 3rem 1.25rem; }
+    }
+
+    /* ─── SCROLL FADE IN ──────────────────────────────────────────── */
+    .fade-in {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    .fade-in.visible { opacity: 1; transform: none; }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <span class="nav-brand">EdgeCheck</span>
+  <div class="nav-links">
+    <a href="#features">Features</a>
+    <a href="#methodology">Methodology</a>
+    <a href="#install">Install</a>
+  </div>
+  <div class="nav-spacer"></div>
+  <a class="btn-nav" href="https://github.com/oliver139-chinesemole/edgecheck" target="_blank" rel="noopener">
+    View on GitHub →
+  </a>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="disclaimer-pill">⚠ Not financial advice</div>
+  <h1>Does following<br/><em>smart money</em><br/>actually work?</h1>
+  <p class="hero-sub">
+    EdgeCheck lets you rigorously test whether cloning institutional investors
+    has any durable edge — with no lookahead, frozen models, and honest benchmarks.
+    The most likely answer is no. That's the point.
+  </p>
+  <div class="hero-cta">
+    <a class="btn-primary" href="#install">Get Started Free</a>
+    <a class="btn-secondary" href="https://github.com/oliver139-chinesemole/edgecheck" target="_blank" rel="noopener">View Source</a>
+  </div>
+  <div class="honest-banner fade-in">
+    <strong>No edge found is a valid, expected, and respectable outcome.</strong><br/>
+    The app surfaces that result plainly — underperforming buy-and-hold SPY is the most likely honest result.
+    We benchmark everything against SPY on a risk-adjusted basis.
+  </div>
+</div>
+
+<hr class="divider" />
+
+<!-- FEATURES -->
+<section id="features">
+  <p class="section-label">Four Tabs</p>
+  <h2 class="section-title">Everything in one place</h2>
+  <p class="section-sub">
+    No API keys needed on first run. All four tabs are populated from committed
+    seed data so the app works immediately on a fresh clone.
+  </p>
+  <div class="tabs-grid">
+    <div class="tab-card fade-in">
+      <div class="tab-icon icon-a">📊</div>
+      <h3>Smart Money</h3>
+      <p>Institutional 13F holdings, insider trades, and congressional disclosures with quarter-over-quarter deltas and consensus signals. Data lag warnings are always visible.</p>
+    </div>
+    <div class="tab-card fade-in">
+      <div class="tab-icon icon-b">🔬</div>
+      <h3>Strategy &amp; Backtest</h3>
+      <p>Leakage-free walk-forward backtest with triple-barrier labeling, realistic round-trip costs, and an equity curve benchmarked against buy-and-hold SPY. Trains and freezes the model.</p>
+    </div>
+    <div class="tab-card fade-in">
+      <div class="tab-icon icon-c">📈</div>
+      <h3>Live Paper Sim</h3>
+      <p>Runs the frozen model forward on seed or real data. Tracks realized-vs-backtest divergence as a first-class metric — a large gap means the backtest was overfit.</p>
+    </div>
+    <div class="tab-card fade-in">
+      <div class="tab-icon icon-d">🏆</div>
+      <h3>Improvement Log</h3>
+      <p>Champion/challenger framework with a permanently frozen hold-out set. A challenger is promoted only when it genuinely beats the champion out-of-sample.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="divider" />
+
+<!-- METHODOLOGY -->
+<section id="methodology">
+  <p class="section-label">Rigor by design</p>
+  <h2 class="section-title">Built to find honest answers</h2>
+  <p class="section-sub">
+    Every methodology choice is made to reduce false positives, not to make the
+    strategy look better than it is.
+  </p>
+  <div class="method-grid">
+    <div class="method-card fade-in">
+      <div class="method-check">✓</div>
+      <div>
+        <h4>No lookahead — unit tested</h4>
+        <p>All features are lagged ≥1 bar. Labels use only future data relative to the entry bar. A test asserts this can't be violated.</p>
+      </div>
+    </div>
+    <div class="method-card fade-in">
+      <div class="method-check">✓</div>
+      <div>
+        <h4>Triple-barrier labeling</h4>
+        <p>Profit take / stop loss / time barrier — not naive fixed-horizon returns, which introduce their own lookahead.</p>
+      </div>
+    </div>
+    <div class="method-card fade-in">
+      <div class="method-check">✓</div>
+      <div>
+        <h4>Realistic costs every trade</h4>
+        <p>8 bps round-trip (spread + slippage + commission) plus 3% annual borrow cost for shorts. Unit tested.</p>
+      </div>
+    </div>
+    <div class="method-card fade-in">
+      <div class="method-check">✓</div>
+      <div>
+        <h4>Walk-forward with embargo</h4>
+        <p>70% train / 30% test with a 5-bar embargo gap to prevent leakage through autocorrelated labels.</p>
+      </div>
+    </div>
+    <div class="method-card fade-in">
+      <div class="method-check">✓</div>
+      <div>
+        <h4>Frozen model contract</h4>
+        <p>After Tab B trains the model, it is serialized and never retrained. The simulator only calls <code>predict()</code>. A unit test asserts this.</p>
+      </div>
+    </div>
+    <div class="method-card fade-in">
+      <div class="method-check">✓</div>
+      <div>
+        <h4>Benchmarked vs SPY always</h4>
+        <p>Every strategy is compared to buy-and-hold SPY over the identical window. Beating zero is not the bar.</p>
+      </div>
+    </div>
+    <div class="method-card fade-in">
+      <div class="method-check">✓</div>
+      <div>
+        <h4>Multiple-testing discipline</h4>
+        <p>Promoting a challenger requires ΔSharpe &gt; 0.15 on the permanently frozen hold-out. The multiple-testing note is always visible.</p>
+      </div>
+    </div>
+    <div class="method-card fade-in">
+      <div class="method-check">✓</div>
+      <div>
+        <h4>Retail constraints modeled</h4>
+        <p>Pattern Day Trader rule, short-borrow frictions, and the partial-data nature of free feeds are surfaced in the UI.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider" />
+
+<!-- INSTALL -->
+<section style="padding: 5rem 2rem;">
+  <div id="install">
+    <p class="section-label">Get started</p>
+    <h2 class="section-title" style="margin-bottom: 0.5rem;">Zero-config setup</h2>
+    <p style="color: var(--muted); margin-bottom: 2rem;">Requires Python 3.9+ and Node 18+. No Docker, no database server, no paid account.</p>
+
+    <div class="install-steps">
+      <div class="install-step">
+        <div class="step-num">01</div>
+        <h4>Clone</h4>
+        <p>Clone the repo from GitHub</p>
+      </div>
+      <div class="install-step">
+        <div class="step-num">02</div>
+        <h4>Install</h4>
+        <p>One command installs all deps and generates seed data</p>
+      </div>
+      <div class="install-step">
+        <div class="step-num">03</div>
+        <h4>Run</h4>
+        <p>Start backend and frontend together</p>
+      </div>
+      <div class="install-step">
+        <div class="step-num">04</div>
+        <h4>Explore</h4>
+        <p>All four tabs work immediately — no API keys</p>
+      </div>
+    </div>
+
+    <div class="code-block">
+      <span class="code-comment"># Clone and enter the repo</span><br/>
+      <span class="code-cmd">git clone https://github.com/oliver139-chinesemole/edgecheck</span><br/>
+      <span class="code-cmd">cd edgecheck</span><br/><br/>
+      <span class="code-comment"># Install Python + Node deps, generate seed data, train default model</span><br/>
+      <span class="code-cmd">make install</span><br/><br/>
+      <span class="code-comment"># Start backend (:8000) + frontend (:5173)</span><br/>
+      <span class="code-cmd">make dev</span><br/><br/>
+      <span class="code-comment"># Run methodology tests (no lookahead, costs, frozen model)</span><br/>
+      <span class="code-cmd">make test</span>
+    </div>
+
+    <p style="color: var(--muted); font-size: 0.85rem; margin-top: 0.5rem;">
+      Then open <a href="http://localhost:5173">http://localhost:5173</a>
+    </p>
+
+    <h3 style="margin: 2.5rem 0 0.5rem; font-size: 1.1rem;">Optional API keys</h3>
+    <p style="color: var(--muted); font-size: 0.875rem; margin-bottom: 0.5rem;">
+      Copy <code>.env.example</code> to <code>.env</code> and fill in the keys you have.
+      Both are free-tier. The app works without them — you just see seed data instead of live data.
+    </p>
+    <div class="keys-grid">
+      <div class="key-card">
+        <div class="key-status status-optional status-free">Free · Optional</div>
+        <h4>Alpaca Paper Trading</h4>
+        <p>Enables live paper orders and real-time price data in Tab C. Free paper account at <a href="https://alpaca.markets" target="_blank" rel="noopener">alpaca.markets</a>.</p>
+        <div class="code-block" style="margin-top: 0.75rem; font-size: 0.78rem;">ALPACA_API_KEY=<br/>ALPACA_SECRET_KEY=</div>
+      </div>
+      <div class="key-card">
+        <div class="key-status status-optional status-free">Free · Optional</div>
+        <h4>Financial Modeling Prep</h4>
+        <p>Enables live 13F and insider trade data refresh in Tab A. Free tier at <a href="https://financialmodelingprep.com" target="_blank" rel="noopener">financialmodelingprep.com</a>.</p>
+        <div class="code-block" style="margin-top: 0.75rem; font-size: 0.78rem;">FMP_API_KEY=</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-disclaimer">
+      <strong>NOT FINANCIAL ADVICE.</strong> EdgeCheck is a research and validation tool for
+      testing hypotheses about market strategies. Its most likely honest result is that no
+      durable edge exists. Do not trade real money based on anything produced by this software.
+      All seed data is synthetic. Past simulated performance does not predict future results.
+    </div>
+    <p>
+      EdgeCheck is open source · MIT License ·
+      <a href="https://github.com/oliver139-chinesemole/edgecheck" target="_blank" rel="noopener">GitHub</a>
+    </p>
+  </div>
+</footer>
+
+<script>
+  // Fade-in on scroll
+  const observer = new IntersectionObserver(
+    entries => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible') }),
+    { threshold: 0.1 }
+  );
+  document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
