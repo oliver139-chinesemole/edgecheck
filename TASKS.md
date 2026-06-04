@@ -80,28 +80,28 @@ Check items off as they are verified working. "Done" = app runs end-to-end on mo
 
 ---
 
-## Feature A — Human Trading Simulator (in progress)
+## Feature A — Human Trading Simulator (✅ complete)
 
-- [ ] `backend/app/services/sim_core.py` — SimCore: submit_order, update_prices, get_portfolio, reset
-- [ ] `backend/app/services/replay_engine.py` — ReplayEngine: run_episode, run_many_episodes
-- [ ] `backend/app/api/human_sim.py` — REST + WebSocket endpoints
-- [ ] DB tables: sim_sessions, sim_orders (database.py)
-- [ ] `frontend/src/hooks/useWebSocket.ts` — WS hook with exponential backoff
-- [ ] `frontend/src/pages/HumanSimulator.tsx` — order entry, equity chart, positions, watchlist
+- [x] `backend/app/services/sim_core.py` — SimCore: submit_order, update_prices, get_portfolio, reset
+- [x] `backend/app/services/replay_engine.py` — ReplayEngine: run_episode, run_many_episodes
+- [x] `backend/app/api/human_sim.py` — REST + WebSocket endpoints
+- [x] DB tables: sim_sessions, sim_orders (database.py)
+- [x] `frontend/src/hooks/useWebSocket.ts` — WS hook with exponential backoff
+- [x] `frontend/src/pages/HumanSimulator.tsx` — order entry, equity chart, positions, watchlist
 
-## Feature B — Background Learning Engine (in progress)
+## Feature B — Background Learning Engine (✅ complete)
 
-- [ ] `backend/app/services/learning_engine.py` — LearningEngine: start/stop/get_status, champion harness
-- [ ] `backend/app/api/agent.py` — GET /status, POST /start, POST /stop, GET /champion
-- [ ] `frontend/src/pages/LearningEngine.tsx` — status, champion card, honest result panel
+- [x] `backend/app/services/learning_engine.py` — LearningEngine: start/stop/get_status, champion harness
+- [x] `backend/app/api/agent.py` — GET /status, POST /start, POST /stop, GET /champion
+- [x] `frontend/src/pages/LearningEngine.tsx` — status, champion card, honest result panel
 
-## Routing update (in progress)
+## Routing update (✅ complete)
 
-- [ ] Add /simulator and /learning routes to App.tsx
+- [x] Add /simulator and /learning routes to App.tsx
 
-## New tests (in progress)
+## New tests (✅ complete)
 
-- [ ] `tests/test_sim_core.py` — buy/sell, costs, short, reset, replay, frozen champion
+- [x] `tests/test_sim_core.py` — buy/sell, costs, short, reset, replay, frozen champion
 
 ---
 
@@ -117,11 +117,11 @@ Check items off as they are verified working. "Done" = app runs end-to-end on mo
 
 ## Acceptance criteria checklist
 
-- [ ] Fresh clone → `make install` → `make dev` → all 4 tabs work on mock data
-- [ ] No console errors, no white screens when any fetch fails
-- [ ] All tests pass
-- [ ] README and .env.example complete
-- [ ] Disclaimer banner visible on every page
-- [ ] "No edge is a valid result" framing in Tab B and Tab C
-- [ ] Adding ALPACA_API_KEY switches Tab C to paper trading without code change
-- [ ] Clean GitHub commit history, .env absent, .env.example present
+- [x] Fresh clone → `make install` → `make dev` → all 4 tabs work on mock data
+- [x] No console errors, no white screens when any fetch fails
+- [x] All tests pass (29 passed, 1 skipped)
+- [x] README and .env.example complete
+- [x] Disclaimer banner visible on every page
+- [x] "No edge is a valid result" framing in Tab B and Tab C
+- [x] Adding ALPACA_API_KEY switches Tab C to paper trading without code change
+- [x] Clean GitHub commit history, .env absent, .env.example present
