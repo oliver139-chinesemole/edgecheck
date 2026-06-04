@@ -1,5 +1,7 @@
 # EdgeCheck — Smart Money Signal & Paper-Trading Research Platform
 
+**🌐 Website:** https://oliver139-chinesemole.github.io/edgecheck/
+
 > **NOT financial advice.** EdgeCheck is a research and validation tool.
 > The most likely honest result is no durable edge. That is a valid, expected, and respectable outcome.
 
