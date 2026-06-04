@@ -1,25 +1,39 @@
+import { Term } from '../components/Glossary'
+
 export default function ImprovementLog() {
   return (
     <div className="page">
       <div className="page-header">
         <h1 className="page-title">Improvement Log</h1>
-        <p className="page-sub">Disciplined, offline model improvement · No online learning · Champion/challenger framework</p>
+        <p className="page-sub">
+          Disciplined, offline model improvement · No online learning ·{' '}
+          <Term id="championChallenger">Champion/challenger framework</Term>
+        </p>
       </div>
 
       <div className="alert alert-green">
         <span>◎</span>
-        <span><strong>Promotion is rare — and expected to be rare.</strong> A challenger must beat the champion on the permanently frozen hold-out set by ΔSharpe &gt; 0.15 to be promoted. Most won't clear that bar.</span>
+        <span>
+          <strong>Promotion is rare — and expected to be rare.</strong> A challenger must beat the champion on
+          the permanently frozen hold-out set by Δ<Term id="sharpe">Sharpe</Term> &gt; 0.15 to be promoted.
+          Most won't clear that bar.
+        </span>
       </div>
 
       <div className="improve-grid">
         <div className="card bordered-blue">
-          <div className="card-title">🏆 Champion Model</div>
+          <div className="card-title">🏆 <Term id="championChallenger">Champion Model</Term></div>
           <div style={{ fontSize: '0.8rem', display: 'grid', gridTemplateColumns: 'auto 1fr', gap: '0.3rem 1rem' }}>
-            <span className="text-muted">Type</span><span className="text-hi text-num">Momentum (RSI + MA)</span>
-            <span className="text-muted">Walk-forward split</span><span className="text-hi text-num">70 / 30 / 5-bar embargo</span>
-            <span className="text-muted">Cost model</span><span className="text-hi text-num">8 bps round-trip</span>
-            <span className="text-muted">Features</span><span className="text-hi text-num">RSI, MA20, MA50, ret20d, vol</span>
-            <span className="text-muted">Status</span><span style={{ color: 'var(--green)' }}>✓ Frozen</span>
+            <span className="text-muted">Type</span>
+            <span className="text-hi text-num">Momentum (RSI + MA)</span>
+            <span className="text-muted"><Term id="walkForward">Walk-forward split</Term></span>
+            <span className="text-hi text-num">70 / 30 / 5-bar embargo</span>
+            <span className="text-muted">Cost model</span>
+            <span className="text-hi text-num">8 bps round-trip</span>
+            <span className="text-muted">Features</span>
+            <span className="text-hi text-num">RSI, MA20, MA50, ret20d, vol</span>
+            <span className="text-muted">Status</span>
+            <span style={{ color: 'var(--green)' }}>✓ Frozen</span>
           </div>
         </div>
 
@@ -30,7 +44,7 @@ export default function ImprovementLog() {
           </p>
           <p style={{ fontSize: '0.78rem', color: 'var(--text-lo)', lineHeight: 1.6 }}>
             Permanently reserved. No model — champion or challenger — may train on data from this window.
-            Performance here is the only truly uncontaminated out-of-sample estimate.
+            Performance here is the only truly uncontaminated <Term id="outOfSample">out-of-sample</Term> estimate.
           </p>
         </div>
 
@@ -38,7 +52,7 @@ export default function ImprovementLog() {
           <div className="card-title">Promotion Rules</div>
           <ul style={{ paddingLeft: '1rem', fontSize: '0.78rem', color: 'var(--text-lo)', lineHeight: 1.8 }}>
             <li>Must outperform champion on the frozen hold-out set</li>
-            <li>Minimum margin: <strong style={{ color: 'var(--text-hi)' }}>ΔSharpe &gt; 0.15</strong></li>
+            <li>Minimum margin: <strong style={{ color: 'var(--text-hi)' }}>Δ<Term id="sharpe">Sharpe</Term> &gt; 0.15</strong></li>
             <li>Training data must not include hold-out dates</li>
             <li>Every promotion is logged with timestamp and reason</li>
           </ul>
@@ -48,7 +62,7 @@ export default function ImprovementLog() {
           <div className="card-title">⚠ Multiple-Testing Note</div>
           <p style={{ fontSize: '0.78rem', color: 'var(--text-lo)', lineHeight: 1.6 }}>
             Every retrain attempt is a hypothesis test. Running many challengers inflates the false-positive
-            rate by random chance — this is the multiple comparisons problem. The ΔSharpe &gt; 0.15 threshold
+            rate by random chance — this is the multiple comparisons problem. The Δ<Term id="sharpe">Sharpe</Term> &gt; 0.15 threshold
             exists to counteract it. Treat promotion as extraordinary, requiring extraordinary evidence.
           </p>
         </div>
@@ -61,9 +75,17 @@ export default function ImprovementLog() {
           Each run produces an offline result that can be compared to the champion on the hold-out window.
         </p>
         <div className="table-scroll">
-          <table className="data-table">
+          <table className="data-table" role="table" aria-label="Challenger history">
             <thead>
-              <tr><th>#</th><th>Type</th><th>OOS Sharpe</th><th>Champion Sharpe</th><th>ΔSharpe</th><th>Promoted?</th><th>Note</th></tr>
+              <tr>
+                <th>#</th>
+                <th>Type</th>
+                <th><Term id="outOfSample">OOS</Term> <Term id="sharpe">Sharpe</Term></th>
+                <th>Champion <Term id="sharpe">Sharpe</Term></th>
+                <th>Δ<Term id="sharpe">Sharpe</Term></th>
+                <th>Promoted?</th>
+                <th>Note</th>
+              </tr>
             </thead>
             <tbody>
               <tr>
@@ -83,6 +105,14 @@ export default function ImprovementLog() {
           into top-conviction names. A large fund that holds 500 names for liquidity reasons is structurally
           different from a small follower who can own just 5. That is the only structural reason a cloner could outperform
           the fund they clone — and it only holds if the signals themselves are valid.
+        </span>
+      </div>
+
+      <div className="alert alert-blue" style={{ marginTop: '0.75rem' }}>
+        <span>📋</span>
+        <span>
+          <strong><Term id="filing13f">13F filings</Term></strong> used in the Selective Clone strategy are always at least 45 days stale by the time they appear.
+          Any "edge" derived from them is operating on public, delayed information that the market has already partially priced in.
         </span>
       </div>
     </div>
