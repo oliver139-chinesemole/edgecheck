@@ -3,6 +3,7 @@ EdgeCheck FastAPI application.
 NOT financial advice. Research and educational use only.
 """
 import logging
+import os
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -37,6 +38,7 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
+        # Local development
         "http://localhost:5173",
         "http://localhost:5174",
         "http://localhost:5175",
@@ -44,6 +46,10 @@ app.add_middleware(
         "http://127.0.0.1:5173",
         "http://127.0.0.1:5174",
         "http://127.0.0.1:3000",
+        # GitHub Pages — update the username if the repo is forked
+        "https://oliver139-chinesemole.github.io",
+        # Allow any custom domain if configured via environment variable
+        *([os.environ["ALLOWED_ORIGIN"]] if os.environ.get("ALLOWED_ORIGIN") else []),
     ],
     allow_credentials=True,
     allow_methods=["*"],

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import type { HealthResponse } from '../types'
+import { BACKEND_URL } from '../lib/config'
 
 export function BackendStatus() {
   const [health, setHealth] = useState<HealthResponse | null>(null)
@@ -9,7 +10,7 @@ export function BackendStatus() {
     let cancelled = false
     const check = async () => {
       try {
-        const r = await fetch('/health', { signal: AbortSignal.timeout(3000) })
+        const r = await fetch(`${BACKEND_URL}/health`, { signal: AbortSignal.timeout(3000) })
         if (!r.ok) throw new Error('unhealthy')
         const data: HealthResponse = await r.json()
         if (!cancelled) { setHealth(data); setError(false) }

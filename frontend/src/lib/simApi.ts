@@ -1,7 +1,8 @@
 // API client for the Market Simulator backend
+import { BACKEND_URL } from './config'
 
-const BASE = '/api/ms'
-const MARKET = '/api/market'
+const BASE   = `${BACKEND_URL}/api/ms`
+const MARKET = `${BACKEND_URL}/api/market`
 
 function getUsername(): string {
   return localStorage.getItem('ms_username') || ''

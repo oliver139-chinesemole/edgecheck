@@ -1,0 +1,27 @@
+# Render.com deployment configuration
+# https://render.com/docs/blueprint-spec
+#
+# One-time setup:
+#   1. Create a free account at https://render.com
+#   2. Connect your GitHub repo
+#   3. Render will detect this file and configure the service automatically
+#   4. After the first deploy, copy the public URL (e.g. https://edgecheck.onrender.com)
+#   5. Add it as a GitHub secret: Settings → Secrets → VITE_API_URL
+#
+# Note: The free tier sleeps after 15 min of inactivity.
+# The first request after sleep takes ~30 s to wake up — normal behaviour.
+# SQLite data persists within a single deployment session only.
+
+services:
+  - type: web
+    name: edgecheck
+    runtime: python
+    rootDir: .
+    buildCommand: bash build.sh
+    startCommand: cd backend && uvicorn main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: ALLOWED_ORIGIN
+        value: https://oliver139-chinesemole.github.io
+    healthCheckPath: /health

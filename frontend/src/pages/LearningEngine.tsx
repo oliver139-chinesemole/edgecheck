@@ -46,7 +46,8 @@ interface AgentStatus {
 
 // ─── Constants ───────────────────────────────────────────────────────────
 
-const API_BASE = '/api/agent'
+import { BACKEND_URL } from '../lib/config'
+const API_BASE = `${BACKEND_URL}/api/agent`
 
 const DEFAULT_STATUS: AgentStatus = {
   phase: 'idle',

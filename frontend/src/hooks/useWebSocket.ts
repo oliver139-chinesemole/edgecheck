@@ -26,19 +26,25 @@ export interface UseWebSocketResult {
   send: (data: string | object) => void
 }
 
+import { BACKEND_URL } from '../lib/config'
+
 const INITIAL_DELAY_MS = 1_000
 const MAX_DELAY_MS = 30_000
 const BACKOFF_FACTOR = 1.5
 
-// The backend WebSocket is at /api/sim/ws (router mounted at /api/sim, handler at /ws)
+// Resolve WebSocket URL for the paper-trading sim stream.
 function resolveWsUrl(): string {
+  if (BACKEND_URL) {
+    // Production: use the configured backend URL
+    return BACKEND_URL
+      .replace(/^https:\/\//, 'wss://')
+      .replace(/^http:\/\//, 'ws://')
+      + '/api/sim/ws'
+  }
+  // Development: Vite proxy doesn't support WS through config here,
+  // so connect directly to localhost:8000.
   const proto = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
-  // In dev with Vite proxy the backend is at localhost:8000
-  // In production (GitHub Pages) the backend won't be available
-  const host = import.meta.env.DEV
-    ? 'localhost:8000'
-    : window.location.host
-  return `${proto}//${host}/api/sim/ws`
+  return `${proto}//localhost:8000/api/sim/ws`
 }
 
 export function useWebSocket(): UseWebSocketResult {
