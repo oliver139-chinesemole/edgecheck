@@ -1,9 +1,14 @@
 import { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
-import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from 'recharts'
-import { getTransactions } from '../../lib/simApi'
+import {
+  PieChart, Pie, Cell, Tooltip, ResponsiveContainer,
+  AreaChart, Area, XAxis, YAxis, CartesianGrid, ReferenceLine,
+} from 'recharts'
+import { getTransactions, getPortfolioHistory } from '../../lib/simApi'
 import { useGameCtx } from './GameLayout'
 import type { Transaction } from '../../types/simulator'
+
+interface EquityPoint { date: string; equity: number; return_pct: number }
 
 function fmt$(v: number) {
   return '$' + Math.abs(v).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
@@ -15,15 +20,18 @@ const COLORS = ['#4a9eff','#2dd68a','#f0b732','#ff5c4a','#b09fff','#6dd5fa','#f0
 export default function PortfolioPage() {
   const { gameId } = useParams<{ gameId: string }>()
   const { portfolio, game } = useGameCtx()
-  const [txns, setTxns] = useState<Transaction[]>([])
-  const [tab, setTab]   = useState<'holdings' | 'history'>('holdings')
+  const [txns, setTxns]           = useState<Transaction[]>([])
+  const [equityHistory, setEqH]   = useState<EquityPoint[]>([])
+  const [tab, setTab]             = useState<'holdings' | 'history'>('holdings')
 
   useEffect(() => {
-    if (gameId) {
-      getTransactions(gameId, 100)
-        .then(r => setTxns((r as { transactions: Transaction[] }).transactions || []))
-        .catch(() => {})
-    }
+    if (!gameId) return
+    getTransactions(gameId, 100)
+      .then(r => setTxns((r as { transactions: Transaction[] }).transactions || []))
+      .catch(() => {})
+    getPortfolioHistory(gameId)
+      .then(r => setEqH((r as { history: EquityPoint[] }).history || []))
+      .catch(() => {})
   }, [gameId])
 
   if (!portfolio) return <div className="loading-state"><div className="spinner" />Loading portfolio…</div>
@@ -56,6 +64,39 @@ export default function PortfolioPage() {
           <div className="ms-ph-stat"><div className="ms-ph-sl">{txns.length}</div><div className="ms-ph-slabel">Trades</div></div>
         </div>
       </div>
+
+      {/* Equity curve */}
+      {equityHistory.length >= 2 && (
+        <div className="ms-ov-card" style={{ marginBottom: '1rem' }}>
+          <div className="ms-ov-card-header">
+            <span className="ms-ov-card-title">Equity Curve</span>
+            <span style={{ fontFamily: 'var(--font-num)', fontSize: '0.78rem', fontWeight: 700, color: ret >= 0 ? 'var(--green)' : 'var(--red)' }}>
+              {fmtPct(ret)} total
+            </span>
+          </div>
+          <ResponsiveContainer width="100%" height={180}>
+            <AreaChart data={equityHistory} margin={{ top: 4, right: 8, bottom: 0, left: 4 }}>
+              <defs>
+                <linearGradient id="pGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%"  stopColor={ret >= 0 ? '#2dd68a' : '#ff5c4a'} stopOpacity={0.2} />
+                  <stop offset="95%" stopColor={ret >= 0 ? '#2dd68a' : '#ff5c4a'} stopOpacity={0} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(80,60,40,0.12)" />
+              <XAxis dataKey="date" tick={{ fontSize: 9 }} tickCount={5} stroke="none" />
+              <YAxis tickFormatter={v => '$' + (v/1000).toFixed(0) + 'k'} tick={{ fontSize: 9 }} stroke="none" width={44} />
+              <ReferenceLine y={portfolio?.starting_cash ?? 100000} stroke="rgba(200,191,175,0.2)" strokeDasharray="4 2" />
+              <Tooltip
+                contentStyle={{ background: 'var(--surface-2)', border: '1px solid var(--border)', fontSize: 11, borderRadius: 8 }}
+                formatter={(v: number) => [`$${v.toLocaleString()}`, 'Equity']}
+              />
+              <Area type="monotone" dataKey="equity"
+                stroke={ret >= 0 ? 'var(--green)' : 'var(--red)'}
+                fill="url(#pGrad)" strokeWidth={2} dot={false} isAnimationActive={false} />
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
+      )}
 
       <div className="ms-portfolio-body">
         {/* Left: holdings + history */}

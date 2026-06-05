@@ -1202,6 +1202,63 @@ input[type="range"] { width: 100%; accent-color: var(--blue); cursor: pointer; }
 .ms-lb-rank-cell { font-size: 1rem; }
 .ms-lb-footer { margin-top: 0.75rem; font-size: 0.72rem; color: var(--text-dim); text-align: center; padding: 0.5rem; }
 
+/* ── Activity feed ─────────────────────────────────────────────────────── */
+.ms-activity-feed { display: flex; flex-direction: column; }
+.ms-activity-item {
+  display: flex; align-items: flex-start; gap: 0.6rem;
+  padding: 0.5rem 0; border-bottom: 1px solid var(--border-dim);
+  font-size: 0.78rem; line-height: 1.4;
+}
+.ms-activity-item:last-child { border-bottom: none; }
+.ms-activity-item.ms-activity-me { background: rgba(74,158,255,0.04); margin: 0 -0.5rem; padding: 0.5rem 0.5rem; border-radius: var(--r-sm); }
+.ms-activity-side { font-size: 0.9rem; flex-shrink: 0; margin-top: 0.05rem; }
+.ms-activity-side.buy  { color: var(--green); }
+.ms-activity-side.sell { color: var(--red); }
+.ms-activity-body { flex: 1; color: var(--text-lo); }
+.ms-activity-body strong { color: var(--text-hi); font-family: var(--font-num); }
+.ms-activity-user { color: var(--text); font-weight: 600; }
+.ms-activity-time { font-size: 0.68rem; color: var(--text-dim); flex-shrink: 0; white-space: nowrap; }
+
+/* ── Watchlist mini panel ───────────────────────────────────────────────── */
+.ms-watch-form { display: flex; gap: 0.4rem; margin-bottom: 0.65rem; }
+.ms-watch-form .ms-input { flex: 1; }
+.ms-watchlist-mini { display: flex; flex-direction: column; }
+.ms-wl-row {
+  display: flex; align-items: center; gap: 0.5rem;
+  padding: 0.32rem 0; border-bottom: 1px solid var(--border-dim);
+  font-size: 0.78rem;
+}
+.ms-wl-row:last-child { border-bottom: none; }
+.ms-wl-ticker { font-family: var(--font-num); font-weight: 700; color: var(--text-hi); width: 52px; flex-shrink: 0; }
+.ms-wl-price  { font-family: var(--font-num); flex: 1; color: var(--text); }
+.ms-wl-chg    { font-family: var(--font-num); font-size: 0.72rem; font-weight: 600; width: 58px; text-align: right; flex-shrink: 0; }
+.ms-wl-chg.up { color: var(--green); }
+.ms-wl-chg.down { color: var(--red); }
+.ms-wl-remove { background: none; border: none; color: var(--text-dim); cursor: pointer; font-size: 0.9rem; padding: 0 0.15rem; flex-shrink: 0; transition: color var(--t); }
+.ms-wl-remove:hover { color: var(--red); }
+
+/* ── Invite card ────────────────────────────────────────────────────────── */
+.ms-invite-card   { }
+.ms-invite-id     { font-size: 0.78rem; color: var(--text-lo); }
+.ms-invite-id strong { font-family: var(--font-num); color: var(--text-hi); font-size: 0.9rem; }
+
+/* ── Trade page: period selector ────────────────────────────────────────── */
+.ms-period-bar {
+  display: flex; align-items: center; gap: 0.3rem;
+  flex-wrap: wrap;
+}
+.ms-period-btn {
+  padding: 0.22rem 0.55rem; font-size: 0.72rem; font-family: var(--font-num);
+  background: var(--surface-2); border: 1px solid var(--border-dim);
+  border-radius: var(--r-sm); color: var(--text-lo); cursor: pointer;
+  transition: all var(--t);
+}
+.ms-period-btn:hover   { border-color: var(--border-strong); color: var(--text); }
+.ms-period-btn.active  { background: var(--blue-dim); border-color: rgba(74,158,255,0.4); color: var(--blue); }
+.ms-refresh-ts  { font-size: 0.68rem; color: var(--text-dim); margin-left: auto; }
+.ms-refresh-link { background: none; border: none; color: var(--blue); cursor: pointer; font-size: 0.68rem; padding: 0; }
+.ms-refresh-link:hover { text-decoration: underline; }
+
 /* ── Rules page ────────────────────────────────────────────────────────── */
 .ms-rules-page { }
 .ms-rule-section { margin-bottom: 1.1rem; }

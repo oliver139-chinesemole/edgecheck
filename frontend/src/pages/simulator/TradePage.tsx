@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useParams } from 'react-router-dom'
 import { AreaChart, Area, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recharts'
 import { searchTickers, getQuote, getChart, placeTrade } from '../../lib/simApi'
@@ -161,6 +161,9 @@ function ConfirmModal({ side, qty, ticker, price, cash, onConfirm, onCancel, bus
   )
 }
 
+const PERIODS = ['5d', '1mo', '3mo', '6mo', '1y'] as const
+type Period = typeof PERIODS[number]
+
 // ── Main trade page ───────────────────────────────────────────────────────
 
 export default function TradePage() {
@@ -171,6 +174,7 @@ export default function TradePage() {
   const [quote, setQuote]       = useState<Quote | null>(null)
   const [chart, setChart]       = useState<HistoricalBar[]>([])
   const [quoteLoading, setQL]   = useState(false)
+  const [period, setPeriod]     = useState<Period>('1mo')
   const [side, setSide]         = useState<'buy' | 'sell'>('buy')
   const [qty, setQty]           = useState('10')
   const [orderType, setOrderType] = useState<'market' | 'limit'>('market')
@@ -178,16 +182,21 @@ export default function TradePage() {
   const [showConfirm, setShowConfirm] = useState(false)
   const [busy, setBusy]         = useState(false)
   const [msg, setMsg]           = useState<{ text: string; ok: boolean } | null>(null)
+  const [lastRefresh, setLastRefresh] = useState(0)
+  const tickerRef = useRef(selectedTicker)
+  tickerRef.current = selectedTicker
 
-  async function loadQuote(ticker: string) {
-    setQL(true); setQuote(null); setChart([])
+  async function loadQuote(ticker: string, p = period) {
+    if (!ticker) return
+    setQL(true)
     try {
       const [q, c] = await Promise.all([
         getQuote(ticker) as Promise<Quote>,
-        getChart(ticker, '1mo') as Promise<{ bars: HistoricalBar[] }>,
+        getChart(ticker, p) as Promise<{ bars: HistoricalBar[] }>,
       ])
       setQuote(q)
       setChart(c.bars || [])
+      setLastRefresh(Date.now())
     } catch {
       setQuote(null)
     } finally {
@@ -195,9 +204,23 @@ export default function TradePage() {
     }
   }
 
+  // Auto-refresh quote every 60 seconds while a ticker is selected
+  useEffect(() => {
+    if (!selectedTicker) return
+    const id = setInterval(() => {
+      if (tickerRef.current) loadQuote(tickerRef.current, period)
+    }, 60_000)
+    return () => clearInterval(id)
+  }, [selectedTicker, period])
+
+  // Re-fetch chart when period changes
+  useEffect(() => {
+    if (selectedTicker) loadQuote(selectedTicker, period)
+  }, [period])
+
   function handleSelect(r: SearchResult) {
     setSelectedTicker(r.ticker)
-    loadQuote(r.ticker)
+    loadQuote(r.ticker, period)
     setMsg(null)
   }
 
@@ -242,6 +265,20 @@ export default function TradePage() {
         {selectedTicker && (
           <>
             <QuoteCard ticker={selectedTicker} quote={quote} chart={chart} />
+
+            {/* Period selector */}
+            <div className="ms-period-bar">
+              {PERIODS.map(p => (
+                <button key={p} className={`ms-period-btn${period === p ? ' active' : ''}`}
+                  onClick={() => setPeriod(p)}>{p}</button>
+              ))}
+              {lastRefresh > 0 && (
+                <span className="ms-refresh-ts">
+                  Updated {new Date(lastRefresh).toLocaleTimeString()}
+                  {' ·'} <button className="ms-refresh-link" onClick={() => loadQuote(selectedTicker, period)}>Refresh</button>
+                </span>
+              )}
+            </div>
 
             <div className="ms-trade-form-card">
               <div className="ms-trade-side-tabs">

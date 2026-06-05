@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useUsername } from '../../hooks/useUsername'
-import { listGames, joinGame } from '../../lib/simApi'
+import { listGames, joinGame, getGame } from '../../lib/simApi'
 import type { Game } from '../../types/simulator'
 
 // ── Username setup modal ──────────────────────────────────────────────────
@@ -187,18 +187,26 @@ export default function SimulatorLanding() {
   useEffect(() => { if (isReady) load() }, [isReady, load])
 
   async function handleJoinByCode() {
+    const code = joinCode.trim().toUpperCase()
+    if (!code) return
     setJoinBusy(true); setJoinErr('')
     try {
-      const res = await listGames({ q: joinCode.trim() }) as { games: Game[] }
-      const match = res.games.find(g => g.id === joinCode.trim().toUpperCase())
-      if (match) {
-        await joinGame(match.id, undefined)
-        navigate(`/market-sim/game/${match.id}`)
-      } else {
-        setJoinErr('Game not found. Check the code and try again.')
+      // Try fetching the game directly by ID first
+      const game = await getGame(code) as Game
+      if (game.is_participant) {
+        navigate(`/market-sim/game/${game.id}`)
+        return
       }
-    } catch (e: unknown) {
-      setJoinErr((e as Error).message)
+      if (!game.is_public) {
+        // Private game — show the join modal with code pre-filled
+        setJoinTarget(game)
+        setJoinBusy(false)
+        return
+      }
+      await joinGame(game.id, undefined)
+      navigate(`/market-sim/game/${game.id}`)
+    } catch {
+      setJoinErr('Game not found. Check the ID or code and try again.')
     } finally {
       setJoinBusy(false)
     }

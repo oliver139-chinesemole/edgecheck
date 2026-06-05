@@ -150,6 +150,17 @@ class MsWatchlistRecord(Base):
     added_at = Column(String, nullable=False)
 
 
+class MsEquitySnapshotRecord(Base):
+    """Portfolio value snapshot recorded after every trade."""
+    __tablename__ = "ms_equity_snapshots"
+    id          = Column(Integer, primary_key=True, autoincrement=True)
+    game_id     = Column(String, nullable=False)
+    username    = Column(String, nullable=False)
+    equity      = Column(Float, nullable=False)
+    cash        = Column(Float, nullable=False)
+    recorded_at = Column(String, nullable=False)
+
+
 _engine = None
 
 

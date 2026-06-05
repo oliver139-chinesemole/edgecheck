@@ -23,6 +23,7 @@ from app.database import (
     get_session,
     MsGameRecord, MsParticipantRecord,
     MsHoldingRecord, MsTransactionRecord, MsWatchlistRecord,
+    MsEquitySnapshotRecord,
 )
 from app.services import market_data as md
 
@@ -172,6 +173,17 @@ def place_trade(
             qty=round(req.qty, 6), fill_price=round(fill_price, 6),
             commission=commission, total_cost=round(total_cost, 6),
             executed_at=_now(),
+        ))
+
+        # Equity snapshot: approximate equity using fill_price for this ticker
+        all_h = sess.query(MsHoldingRecord).filter_by(game_id=game_id, username=username).all()
+        snap_equity = p.cash + sum(
+            h.shares * (fill_price if h.ticker == ticker else h.avg_cost) for h in all_h
+        )
+        sess.add(MsEquitySnapshotRecord(
+            game_id=game_id, username=username,
+            equity=round(snap_equity, 2), cash=round(p.cash, 2),
+            recorded_at=_now(),
         ))
         sess.commit()
 
@@ -420,3 +432,81 @@ def remove_watchlist(
             sess.delete(item)
             sess.commit()
     return {"message": f"Removed {ticker.upper()} from watchlist."}
+
+
+# ── GET /games/{id}/portfolio/history ────────────────────────────────────
+
+@router.get("/games/{game_id}/portfolio/history")
+def get_portfolio_history(game_id: str, x_username: Optional[str] = Header(None)):
+    username = _require_user(x_username)
+    with get_session() as sess:
+        g = sess.get(MsGameRecord, game_id)
+        if not g:
+            raise HTTPException(404, detail="Game not found.")
+        snapshots = (
+            sess.query(MsEquitySnapshotRecord)
+            .filter_by(game_id=game_id, username=username)
+            .order_by(MsEquitySnapshotRecord.recorded_at)
+            .all()
+        )
+        starting = g.starting_cash
+        return {
+            "history": [
+                {
+                    "date":       s.recorded_at[:10],
+                    "time":       s.recorded_at,
+                    "equity":     s.equity,
+                    "return_pct": round((s.equity / starting - 1) * 100, 4),
+                }
+                for s in snapshots
+            ],
+            "starting_cash": starting,
+        }
+
+
+# ── GET /games/{id}/activity ──────────────────────────────────────────────
+
+@router.get("/games/{game_id}/activity")
+def get_activity(
+    game_id: str,
+    limit: int = Query(20, ge=1, le=100),
+    x_username: Optional[str] = Header(None),
+):
+    """Recent trades across all participants (if portfolio_public) or caller only."""
+    username = _require_user(x_username)
+    with get_session() as sess:
+        g = sess.get(MsGameRecord, game_id)
+        if not g:
+            raise HTTPException(404, detail="Game not found.")
+
+        if g.portfolio_public:
+            txns = (
+                sess.query(MsTransactionRecord)
+                .filter(MsTransactionRecord.game_id == game_id)
+                .order_by(MsTransactionRecord.executed_at.desc())
+                .limit(limit)
+                .all()
+            )
+        else:
+            txns = (
+                sess.query(MsTransactionRecord)
+                .filter_by(game_id=game_id, username=username)
+                .order_by(MsTransactionRecord.executed_at.desc())
+                .limit(limit)
+                .all()
+            )
+        return {
+            "activity": [
+                {
+                    "username":    t.username,
+                    "ticker":      t.ticker,
+                    "side":        t.side,
+                    "qty":         t.qty,
+                    "fill_price":  t.fill_price,
+                    "executed_at": t.executed_at,
+                    "is_me":       t.username == username,
+                }
+                for t in txns
+            ],
+            "portfolio_public": bool(g.portfolio_public),
+        }

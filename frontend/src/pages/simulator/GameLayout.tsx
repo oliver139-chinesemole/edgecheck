@@ -134,6 +134,26 @@ export default function GameLayout() {
           ))}
         </div>
 
+        {/* Status banners */}
+        {game.status === 'pending' && (
+          <div className="alert alert-amber" style={{ marginBottom: '0.75rem' }}>
+            <span className="alert-icon">⏳</span>
+            <div>
+              <strong>Game starts on {game.start_date}.</strong>{' '}
+              You can join now and will begin with ${game.starting_cash.toLocaleString()} when trading opens.
+            </div>
+          </div>
+        )}
+        {game.status === 'ended' && (
+          <div className="alert alert-amber" style={{ marginBottom: '0.75rem' }}>
+            <span className="alert-icon">🏁</span>
+            <div>
+              <strong>This game ended on {game.end_date}.</strong>{' '}
+              Trading is closed. The leaderboard reflects final standings.
+            </div>
+          </div>
+        )}
+
         {/* Tab content */}
         <div className="ms-game-content">
           <Outlet />

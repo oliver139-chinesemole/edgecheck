@@ -74,6 +74,12 @@ export const getPortfolio = (gameId: string) =>
 export const getTransactions = (gameId: string, limit = 50) =>
   apiFetch(`${BASE}/games/${gameId}/transactions?limit=${limit}`)
 
+export const getPortfolioHistory = (gameId: string) =>
+  apiFetch(`${BASE}/games/${gameId}/portfolio/history`)
+
+export const getActivity = (gameId: string, limit = 20) =>
+  apiFetch(`${BASE}/games/${gameId}/activity?limit=${limit}`)
+
 // ── Leaderboard ───────────────────────────────────────────────────────────
 
 export const getLeaderboard = (gameId: string) =>
