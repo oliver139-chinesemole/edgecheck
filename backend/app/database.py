@@ -6,7 +6,7 @@ from __future__ import annotations
 
 import logging
 from pathlib import Path
-from sqlalchemy import create_engine, Column, String, Float, Integer, DateTime, text
+from sqlalchemy import create_engine, Column, String, Float, Integer, Text, text
 from sqlalchemy.orm import DeclarativeBase, Session
 from sqlalchemy.pool import StaticPool
 
@@ -72,6 +72,82 @@ class SimOrderRecord(Base):
     fill_price = Column(Float, nullable=True)
     fill_qty = Column(Float, nullable=True)
     message = Column(String, default="")
+
+
+# ── Market Simulator tables ──────────────────────────────────────────────
+
+
+class SimUserRecord(Base):
+    __tablename__ = "ms_users"
+    username  = Column(String, primary_key=True)
+    display_name = Column(String, nullable=False)
+    created_at   = Column(String, nullable=False)
+
+
+class MsGameRecord(Base):
+    __tablename__ = "ms_games"
+    id               = Column(String, primary_key=True)        # uuid
+    name             = Column(String, nullable=False)
+    description      = Column(Text, default="")
+    creator          = Column(String, nullable=False)
+    is_public        = Column(Integer, default=1)              # 1=public 0=private
+    join_code        = Column(String, nullable=True)           # private game code
+    starting_cash    = Column(Float, default=100_000.0)
+    start_date       = Column(String, nullable=False)          # ISO date
+    end_date         = Column(String, nullable=False)
+    allow_short      = Column(Integer, default=0)
+    allow_margin     = Column(Integer, default=0)
+    allow_day_trading= Column(Integer, default=1)
+    commission       = Column(Float, default=0.0)
+    max_position_pct = Column(Float, default=1.0)              # 1.0 = no limit
+    rank_by          = Column(String, default="return_pct")   # "return_pct"|"total_value"
+    portfolio_public = Column(Integer, default=1)
+    allowed_assets   = Column(Text, default='["stocks","etfs"]')  # json
+    created_at       = Column(String, nullable=False)
+
+
+class MsParticipantRecord(Base):
+    __tablename__ = "ms_participants"
+    id        = Column(Integer, primary_key=True, autoincrement=True)
+    game_id   = Column(String, nullable=False)
+    username  = Column(String, nullable=False)
+    cash      = Column(Float, nullable=False)
+    joined_at = Column(String, nullable=False)
+
+
+class MsHoldingRecord(Base):
+    __tablename__ = "ms_holdings"
+    id         = Column(Integer, primary_key=True, autoincrement=True)
+    game_id    = Column(String, nullable=False)
+    username   = Column(String, nullable=False)
+    ticker     = Column(String, nullable=False)
+    shares     = Column(Float, nullable=False)
+    avg_cost   = Column(Float, nullable=False)
+    updated_at = Column(String, nullable=False)
+
+
+class MsTransactionRecord(Base):
+    __tablename__ = "ms_transactions"
+    id          = Column(Integer, primary_key=True, autoincrement=True)
+    game_id     = Column(String, nullable=False)
+    username    = Column(String, nullable=False)
+    ticker      = Column(String, nullable=False)
+    side        = Column(String, nullable=False)    # buy/sell
+    order_type  = Column(String, nullable=False)    # market/limit
+    qty         = Column(Float, nullable=False)
+    fill_price  = Column(Float, nullable=False)
+    commission  = Column(Float, default=0.0)
+    total_cost  = Column(Float, nullable=False)     # positive=cash out, negative=cash in
+    executed_at = Column(String, nullable=False)
+
+
+class MsWatchlistRecord(Base):
+    __tablename__ = "ms_watchlist"
+    id       = Column(Integer, primary_key=True, autoincrement=True)
+    game_id  = Column(String, nullable=False)
+    username = Column(String, nullable=False)
+    ticker   = Column(String, nullable=False)
+    added_at = Column(String, nullable=False)
 
 
 _engine = None

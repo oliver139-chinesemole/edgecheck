@@ -831,3 +831,385 @@ input[type="range"] { width: 100%; accent-color: var(--blue); cursor: pointer; }
 
 /* Empty row */
 .hms-empty-row { padding: 1.5rem; text-align: center; color: var(--text-lo); font-size: 0.8rem; }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   MARKET SIMULATOR  (ms-*)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Base page ─────────────────────────────────────────────────────────── */
+.ms-page { max-width: 1200px; margin: 0 auto; }
+
+/* ── Shared buttons ────────────────────────────────────────────────────── */
+.ms-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 0.5rem 1.1rem; border-radius: var(--r-sm);
+  font-size: 0.84rem; font-weight: 600; cursor: pointer;
+  transition: all var(--t); border: 1px solid transparent;
+  text-decoration: none; white-space: nowrap;
+}
+.ms-btn:hover { text-decoration: none; }
+.ms-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.ms-btn-primary { background: var(--blue); border-color: var(--blue); color: #fff; }
+.ms-btn-primary:hover:not(:disabled) { background: #3a8ef5; box-shadow: 0 2px 12px rgba(74,158,255,0.3); }
+.ms-btn-outline  { background: transparent; border-color: var(--border-strong); color: var(--text); }
+.ms-btn-outline:hover { border-color: var(--blue); color: var(--blue); }
+.ms-btn-ghost    { background: transparent; border-color: transparent; color: var(--text-lo); }
+.ms-btn-ghost:hover { color: var(--text); }
+.ms-btn-buy  { background: var(--green); border-color: var(--green); color: #071a0f; }
+.ms-btn-buy:hover:not(:disabled)  { background: #25c97c; }
+.ms-btn-sell { background: var(--red); border-color: var(--red); color: #1a0806; }
+.ms-btn-sell:hover:not(:disabled) { background: #f04030; }
+.ms-btn-sm   { padding: 0.3rem 0.75rem; font-size: 0.76rem; }
+.ms-btn-lg   { padding: 0.65rem 1.45rem; font-size: 0.9rem; }
+.ms-btn-full { width: 100%; }
+
+/* ── Shared inputs ─────────────────────────────────────────────────────── */
+.ms-input {
+  width: 100%; padding: 0.48rem 0.75rem;
+  background: var(--surface-2); border: 1px solid var(--border-dim);
+  border-radius: var(--r-sm); color: var(--text-hi); font-size: 0.84rem;
+  font-family: var(--font-sans); transition: border-color var(--t);
+}
+.ms-input:focus { outline: none; border-color: var(--blue); }
+.ms-input-lg { font-size: 1rem; padding: 0.6rem 0.9rem; }
+.ms-textarea { resize: vertical; min-height: 60px; font-family: var(--font-sans); }
+.ms-input-prefix-wrap { position: relative; }
+.ms-input-prefix { position: absolute; left: 0.65rem; top: 50%; transform: translateY(-50%); color: var(--text-lo); font-size: 0.84rem; pointer-events: none; }
+.ms-input.ms-input-prefix { padding-left: 1.5rem; }
+.ms-search-input { max-width: 220px; }
+
+/* ── Shared labels / errors ────────────────────────────────────────────── */
+.ms-field-label { font-size: 0.72rem; color: var(--text-lo); margin-bottom: 0.25rem; font-weight: 500; display: block; }
+.ms-optional    { color: var(--text-dim); font-weight: 400; }
+.ms-field-hint  { font-size: 0.68rem; color: var(--text-dim); margin-top: 0.2rem; }
+.ms-field-error { font-size: 0.76rem; color: var(--red); margin-top: 0.2rem; }
+
+/* ── Back link ─────────────────────────────────────────────────────────── */
+.ms-back-link    { font-size: 0.82rem; color: var(--text-lo); text-decoration: none; display: inline-flex; align-items: center; gap: 0.25rem; margin-bottom: 1rem; }
+.ms-back-link:hover { color: var(--blue); text-decoration: none; }
+.ms-back-link-sm { font-size: 0.75rem; color: var(--text-lo); text-decoration: none; flex-shrink: 0; }
+.ms-back-link-sm:hover { color: var(--blue); text-decoration: none; }
+
+/* ── Badges ────────────────────────────────────────────────────────────── */
+.ms-badge { display: inline-flex; align-items: center; gap: 0.2rem; padding: 0.12rem 0.5rem; border-radius: 99px; font-size: 0.65rem; font-weight: 700; font-family: var(--font-num); letter-spacing: 0.04em; }
+.ms-badge-active  { background: rgba(45,214,138,0.15); color: var(--green); border: 1px solid rgba(45,214,138,0.3); }
+.ms-badge-pending { background: var(--amber-dim); color: var(--amber); border: 1px solid rgba(240,183,50,0.3); }
+.ms-badge-ended   { background: var(--surface-3); color: var(--text-lo); border: 1px solid var(--border-dim); }
+.ms-badge-private { background: var(--surface-3); color: var(--text-lo); border: 1px solid var(--border-dim); }
+.ms-badge-joined  { background: var(--blue-dim); color: var(--blue); border: 1px solid rgba(74,158,255,0.3); }
+
+/* ── Username modal ────────────────────────────────────────────────────── */
+.ms-modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.72);
+  backdrop-filter: blur(4px); z-index: 1000;
+  display: flex; align-items: center; justify-content: center; padding: 1rem;
+}
+.ms-modal {
+  background: var(--surface-1); border: 1px solid var(--border);
+  border-radius: var(--r-lg); padding: 2rem 1.75rem;
+  width: 100%; max-width: 400px;
+  position: relative; text-align: center;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.6);
+}
+.ms-modal-close { position: absolute; top: 1rem; right: 1rem; background: none; border: none; color: var(--text-lo); font-size: 1rem; cursor: pointer; }
+.ms-modal-close:hover { color: var(--text); }
+.ms-modal-icon  { font-size: 2.5rem; margin-bottom: 0.5rem; }
+.ms-modal-title { font-size: 1.2rem; font-weight: 700; color: var(--text-hi); letter-spacing: -0.02em; margin-bottom: 0.4rem; }
+.ms-modal-sub   { font-size: 0.82rem; color: var(--text-lo); margin-bottom: 1.25rem; }
+.ms-modal-form  { display: flex; flex-direction: column; gap: 0.75rem; text-align: left; }
+.ms-modal-disclaimer { font-size: 0.68rem; color: var(--text-dim); margin-top: 1rem; }
+.ms-join-meta   { text-align: left; margin-bottom: 1rem; }
+.ms-join-row    { display: flex; justify-content: space-between; padding: 0.4rem 0; border-bottom: 1px solid var(--border-dim); font-size: 0.82rem; }
+.ms-join-row:last-child { border-bottom: none; }
+.ms-join-row span { color: var(--text-lo); }
+.ms-join-row strong { color: var(--text-hi); }
+
+/* ── Landing hero ──────────────────────────────────────────────────────── */
+.ms-hero { margin: -1.75rem -1.5rem 2rem; padding: 2.5rem 1.5rem 2rem; background: linear-gradient(135deg, rgba(74,158,255,0.07) 0%, rgba(139,125,255,0.06) 100%); border-bottom: 1px solid var(--border-dim); }
+.ms-hero-inner  { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 2rem; flex-wrap: wrap; }
+.ms-hero-text   { flex: 1; min-width: 280px; }
+.ms-hero-eyebrow { font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--blue); margin-bottom: 0.5rem; }
+.ms-hero-title  { font-size: 2.2rem; font-weight: 700; color: var(--text-hi); letter-spacing: -0.04em; line-height: 1.1; margin-bottom: 0.65rem; }
+.ms-hero-sub    { font-size: 0.92rem; color: var(--text-lo); line-height: 1.6; margin-bottom: 1.25rem; max-width: 420px; }
+.ms-hero-actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+.ms-hero-stats  { display: flex; gap: 1.5rem; flex-shrink: 0; }
+.ms-hero-stat   { text-align: center; }
+.ms-hero-stat-val   { font-family: var(--font-num); font-size: 1.6rem; font-weight: 700; color: var(--text-hi); }
+.ms-hero-stat-label { font-size: 0.72rem; color: var(--text-lo); margin-top: 0.1rem; }
+
+/* ── Sections ──────────────────────────────────────────────────────────── */
+.ms-section        { margin-bottom: 2.5rem; }
+.ms-section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem; }
+.ms-section-title  { font-size: 1.05rem; font-weight: 700; color: var(--text-hi); letter-spacing: -0.02em; }
+
+/* ── Game grid + cards ─────────────────────────────────────────────────── */
+.ms-game-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; }
+.ms-game-card {
+  background: var(--surface-1); border: 1px solid var(--border-dim);
+  border-radius: var(--r); padding: 1.1rem 1.2rem;
+  cursor: pointer; transition: border-color var(--t), transform var(--t), box-shadow var(--t);
+  display: flex; flex-direction: column; gap: 0.5rem;
+}
+.ms-game-card:hover { border-color: var(--border-strong); transform: translateY(-1px); box-shadow: 0 6px 24px rgba(0,0,0,0.25); }
+.ms-game-card:focus { outline: 2px solid var(--blue); }
+.ms-game-card-header { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+.ms-game-card-name   { font-size: 1rem; font-weight: 700; color: var(--text-hi); letter-spacing: -0.02em; line-height: 1.3; }
+.ms-game-card-desc   { font-size: 0.78rem; color: var(--text-lo); line-height: 1.5; }
+.ms-game-card-meta   { font-size: 0.74rem; color: var(--text-dim); display: flex; gap: 0.4rem; flex-wrap: wrap; }
+.ms-game-card-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 0.35rem; }
+.ms-game-card-by     { font-size: 0.72rem; color: var(--text-dim); }
+
+/* ── Join by code ──────────────────────────────────────────────────────── */
+.ms-join-code-section { padding: 1.5rem; background: var(--surface-1); border: 1px solid var(--border-dim); border-radius: var(--r); }
+.ms-join-code-row { display: flex; gap: 0.75rem; margin-top: 0.75rem; }
+.ms-join-code-row .ms-input { max-width: 300px; }
+
+/* ── Empty state ───────────────────────────────────────────────────────── */
+.ms-empty-state { text-align: center; padding: 3rem 1.5rem; }
+.ms-empty-icon  { font-size: 2.5rem; margin-bottom: 0.75rem; }
+.ms-empty-title { font-size: 1rem; font-weight: 600; color: var(--text); margin-bottom: 0.3rem; }
+.ms-empty-sub   { font-size: 0.82rem; color: var(--text-lo); }
+
+/* ── Footer disclaimer ─────────────────────────────────────────────────── */
+.ms-disclaimer-footer { margin-top: 3rem; padding: 1rem; text-align: center; font-size: 0.74rem; color: var(--text-dim); border-top: 1px solid var(--border-dim); line-height: 1.6; }
+
+/* ── Create game page ──────────────────────────────────────────────────── */
+.ms-create-page   { max-width: 680px; margin: 0 auto; }
+.ms-create-header { margin-bottom: 1.75rem; }
+.ms-create-title  { font-size: 1.5rem; font-weight: 700; color: var(--text-hi); letter-spacing: -0.03em; margin-bottom: 0.3rem; }
+.ms-create-sub    { font-size: 0.84rem; color: var(--text-lo); }
+.ms-create-form   { display: flex; flex-direction: column; gap: 0; }
+.ms-form-section  { padding: 1.5rem; border: 1px solid var(--border-dim); border-radius: var(--r); background: var(--surface-1); margin-bottom: 1rem; }
+.ms-form-section-title { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.09em; color: var(--text-lo); margin-bottom: 1.1rem; }
+.ms-field         { display: flex; flex-direction: column; gap: 0; margin-bottom: 0.9rem; }
+.ms-field:last-child { margin-bottom: 0; }
+.ms-field-row     { display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem; margin-bottom: 0.9rem; }
+.ms-radio-group   { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; margin-top: 0.35rem; }
+.ms-radio-card    {
+  display: flex; flex-direction: column; gap: 0.2rem;
+  padding: 0.85rem; border: 1px solid var(--border-dim); border-radius: var(--r-sm);
+  cursor: pointer; transition: all var(--t); background: var(--surface-2);
+}
+.ms-radio-card:hover   { border-color: var(--border-strong); }
+.ms-radio-card.selected{ border-color: var(--blue); background: var(--blue-dim); }
+.ms-radio-icon  { font-size: 1.1rem; }
+.ms-radio-title { font-size: 0.82rem; font-weight: 600; color: var(--text-hi); }
+.ms-radio-desc  { font-size: 0.7rem; color: var(--text-lo); }
+.ms-toggle-group   { display: flex; flex-direction: column; gap: 0; }
+.ms-toggle-row     { display: flex; justify-content: space-between; align-items: center; padding: 0.85rem 0; border-bottom: 1px solid var(--border-dim); cursor: pointer; }
+.ms-toggle-row:last-child { border-bottom: none; }
+.ms-toggle-title { font-size: 0.84rem; font-weight: 500; color: var(--text-hi); }
+.ms-toggle-desc  { font-size: 0.72rem; color: var(--text-lo); margin-top: 0.1rem; }
+.ms-toggle-check { accent-color: var(--blue); width: 18px; height: 18px; cursor: pointer; flex-shrink: 0; }
+.ms-form-error   { padding: 0.6rem 0.85rem; background: var(--red-dim); border: 1px solid rgba(255,92,74,0.25); border-radius: var(--r-sm); font-size: 0.8rem; color: var(--red); }
+.ms-form-actions { display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.25rem; }
+.ms-form-disclaimer { font-size: 0.72rem; color: var(--text-dim); text-align: center; margin-top: 0.75rem; }
+
+/* ── Game layout ───────────────────────────────────────────────────────── */
+.ms-game-shell   { display: flex; flex-direction: column; }
+.ms-game-header  {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 1rem 0 0.75rem; margin-bottom: 0;
+  border-bottom: 1px solid var(--border-dim); flex-wrap: wrap; gap: 0.75rem;
+}
+.ms-game-header-left { display: flex; align-items: flex-start; gap: 0.75rem; }
+.ms-game-title       { font-size: 1.25rem; font-weight: 700; color: var(--text-hi); letter-spacing: -0.02em; }
+.ms-game-header-meta { display: flex; align-items: center; gap: 0.6rem; font-size: 0.76rem; color: var(--text-lo); margin-top: 0.25rem; flex-wrap: wrap; }
+.ms-game-header-right { flex-shrink: 0; }
+.ms-mini-portfolio  { text-align: right; }
+.ms-mini-equity     { font-family: var(--font-num); font-size: 1.15rem; font-weight: 700; color: var(--text-hi); }
+.ms-mini-ret        { font-family: var(--font-num); font-size: 0.82rem; font-weight: 600; }
+.ms-mini-ret.pos    { color: var(--green); }
+.ms-mini-ret.neg    { color: var(--red); }
+.ms-game-tabs {
+  display: flex; gap: 0; border-bottom: 1px solid var(--border-dim);
+  margin-bottom: 1.25rem; overflow-x: auto; scrollbar-width: none;
+}
+.ms-game-tabs::-webkit-scrollbar { display: none; }
+.ms-game-tab {
+  padding: 0.6rem 1.1rem; background: none; border: none;
+  border-bottom: 2px solid transparent; color: var(--text-lo);
+  font-size: 0.84rem; font-weight: 500; cursor: pointer;
+  transition: color var(--t), border-color var(--t);
+  white-space: nowrap; text-decoration: none; display: inline-flex;
+}
+.ms-game-tab:hover { color: var(--text); text-decoration: none; }
+.ms-game-tab.active { color: var(--text-hi); border-bottom-color: var(--blue); }
+.ms-game-content { min-height: 400px; }
+
+/* ── Shared table ──────────────────────────────────────────────────────── */
+.ms-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+.ms-table th { text-align: left; padding: 0.45rem 0.7rem; font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-dim); border-bottom: 1px solid var(--border-dim); background: var(--surface-1); white-space: nowrap; }
+.ms-table td { padding: 0.45rem 0.7rem; border-bottom: 1px solid var(--border-dim); white-space: nowrap; }
+.ms-table tr:last-child td { border-bottom: none; }
+.ms-table tbody tr:hover td { background: rgba(255,255,255,0.014); }
+.ms-table td.num { font-family: var(--font-num); font-size: 0.82rem; }
+.ms-table-full { width: 100%; }
+.ms-see-all     { font-size: 0.74rem; color: var(--blue); text-decoration: none; }
+.ms-see-all:hover { text-decoration: underline; }
+
+/* ── Shared card ───────────────────────────────────────────────────────── */
+.ms-ov-card     { background: var(--surface-1); border: 1px solid var(--border-dim); border-radius: var(--r); padding: 1rem 1.1rem; }
+.ms-ov-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; }
+.ms-ov-card-title  { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.09em; color: var(--text-lo); }
+.ms-ov-empty    { padding: 1.5rem; text-align: center; color: var(--text-lo); font-size: 0.8rem; }
+.ms-ov-empty a  { color: var(--blue); }
+
+/* ── Overview page ─────────────────────────────────────────────────────── */
+.ms-overview { }
+.ms-stats-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 0.6rem; margin-bottom: 1.25rem; }
+.ms-quick-stat { background: var(--surface-1); border: 1px solid var(--border-dim); border-radius: var(--r-sm); padding: 0.85rem 1rem; }
+.ms-qs-label   { font-size: 0.64rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-lo); margin-bottom: 0.2rem; }
+.ms-qs-val     { font-family: var(--font-num); font-size: 1.05rem; font-weight: 600; color: var(--text-hi); }
+.ms-overview-body { display: grid; grid-template-columns: 1fr 300px; gap: 1rem; align-items: start; }
+@media (max-width: 820px) { .ms-overview-body { grid-template-columns: 1fr; } }
+.ms-overview-main { display: flex; flex-direction: column; gap: 1rem; }
+.ms-overview-side { display: flex; flex-direction: column; gap: 1rem; }
+
+/* Leaderboard preview */
+.ms-lb-preview     { display: flex; flex-direction: column; }
+.ms-lb-preview-row { display: flex; align-items: center; gap: 0.65rem; padding: 0.45rem 0; border-bottom: 1px solid var(--border-dim); font-size: 0.82rem; }
+.ms-lb-preview-row:last-child { border-bottom: none; }
+.ms-lb-preview-row.ms-lb-me { background: var(--blue-dim); margin: 0 -0.5rem; padding: 0.45rem 0.5rem; border-radius: var(--r-sm); border-bottom: none; }
+.ms-lb-rank   { font-family: var(--font-num); font-weight: 700; color: var(--text-lo); font-size: 0.75rem; width: 24px; }
+.ms-lb-name   { flex: 1; color: var(--text); font-size: 0.82rem; }
+.ms-lb-ret    { font-family: var(--font-num); font-weight: 600; font-size: 0.78rem; }
+.ms-lb-ret.pos { color: var(--green); }
+.ms-lb-ret.neg { color: var(--red); }
+
+/* Trade CTA card */
+.ms-trade-cta {
+  display: flex; align-items: center; gap: 0.9rem;
+  padding: 1rem 1.1rem; background: var(--surface-2);
+  border: 1px solid rgba(74,158,255,0.25); border-radius: var(--r);
+  text-decoration: none; transition: all var(--t);
+}
+.ms-trade-cta:hover { border-color: var(--blue); background: var(--blue-dim); text-decoration: none; }
+.ms-trade-cta-icon  { font-size: 1.5rem; flex-shrink: 0; }
+.ms-trade-cta-title { font-weight: 600; color: var(--text-hi); font-size: 0.88rem; }
+.ms-trade-cta-sub   { font-size: 0.72rem; color: var(--text-lo); margin-top: 0.1rem; }
+.ms-trade-cta-arrow { color: var(--blue); font-size: 1.1rem; margin-left: auto; flex-shrink: 0; }
+
+/* Game info card */
+.ms-game-info-rows { display: flex; flex-direction: column; }
+.ms-gi-row { display: flex; justify-content: space-between; padding: 0.35rem 0; border-bottom: 1px solid var(--border-dim); font-size: 0.78rem; }
+.ms-gi-row:last-child { border-bottom: none; }
+.ms-gi-row span:first-child { color: var(--text-lo); }
+.ms-gi-row span:last-child, .ms-gi-row strong { color: var(--text-hi); font-family: var(--font-num); font-size: 0.78rem; }
+
+/* ── Trade page ────────────────────────────────────────────────────────── */
+.ms-trade-page { display: grid; grid-template-columns: 1fr 260px; gap: 1.25rem; align-items: start; }
+@media (max-width: 820px) { .ms-trade-page { grid-template-columns: 1fr; } }
+.ms-trade-left { display: flex; flex-direction: column; gap: 0.85rem; }
+.ms-trade-right { display: flex; flex-direction: column; gap: 0.85rem; }
+.ms-trade-search-wrap { }
+
+/* Search dropdown */
+.ms-search-wrap   { position: relative; display: flex; align-items: center; }
+.ms-search-icon   { position: absolute; left: 0.75rem; font-size: 0.95rem; pointer-events: none; }
+.ms-search-lg     { padding-left: 2.2rem; font-size: 0.92rem; }
+.ms-search-spinner { position: absolute; right: 0.75rem; width: 14px; height: 14px; border: 2px solid var(--surface-3); border-top-color: var(--blue); border-radius: 50%; animation: spin 0.65s linear infinite; }
+.ms-search-dropdown {
+  position: absolute; top: calc(100% + 4px); left: 0; right: 0; z-index: 200;
+  background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: var(--r-sm); overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.45);
+}
+.ms-search-item   { display: flex; align-items: center; gap: 0.75rem; padding: 0.6rem 0.9rem; cursor: pointer; transition: background var(--t); }
+.ms-search-item:hover { background: var(--surface-3); }
+.ms-si-ticker { font-family: var(--font-num); font-weight: 700; color: var(--text-hi); width: 60px; flex-shrink: 0; }
+.ms-si-name   { flex: 1; font-size: 0.8rem; color: var(--text-lo); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ms-si-type   { font-size: 0.65rem; text-transform: uppercase; background: var(--surface-3); color: var(--text-dim); padding: 0.1em 0.4em; border-radius: 3px; flex-shrink: 0; }
+
+/* Quote card */
+.ms-quote-card { background: var(--surface-1); border: 1px solid var(--border-dim); border-radius: var(--r); padding: 1.1rem 1.2rem; }
+.ms-quote-up   { border-left: 3px solid var(--green); }
+.ms-quote-down { border-left: 3px solid var(--red); }
+.ms-quote-loading { min-height: 120px; display: flex; align-items: center; justify-content: center; }
+.ms-qc-header  { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.25rem; }
+.ms-qc-ticker  { font-family: var(--font-num); font-size: 1.25rem; font-weight: 700; color: var(--text-hi); letter-spacing: 0.02em; }
+.ms-qc-name    { font-size: 0.76rem; color: var(--text-lo); margin-top: 0.1rem; }
+.ms-qc-right   { text-align: right; }
+.ms-qc-price   { font-family: var(--font-num); font-size: 1.5rem; font-weight: 700; color: var(--text-hi); letter-spacing: -0.03em; }
+.ms-qc-change  { font-family: var(--font-num); font-size: 0.82rem; font-weight: 600; margin-top: 0.1rem; }
+.ms-qc-change.up   { color: var(--green); }
+.ms-qc-change.down { color: var(--red); }
+.ms-qc-delay-note  { font-size: 0.65rem; color: var(--text-dim); margin-bottom: 0.5rem; }
+.ms-qc-chart   { margin-top: 0.25rem; }
+
+/* Trade form */
+.ms-trade-form-card { background: var(--surface-1); border: 1px solid var(--border-dim); border-radius: var(--r); padding: 1.1rem 1.2rem; }
+.ms-trade-side-tabs { display: grid; grid-template-columns: 1fr 1fr; border: 1px solid var(--border-dim); border-radius: var(--r-sm); overflow: hidden; }
+.ms-trade-side-btn { padding: 0.52rem; background: var(--surface-2); border: none; font-size: 0.84rem; font-weight: 600; cursor: pointer; transition: all var(--t); }
+.ms-trade-side-btn.buy.active  { background: rgba(45,214,138,0.15); color: var(--green); }
+.ms-trade-side-btn.sell.active { background: rgba(255,92,74,0.12);  color: var(--red); }
+.ms-trade-side-btn:not(.active) { color: var(--text-lo); }
+.ms-trade-summary { background: var(--surface-2); border-radius: var(--r-sm); padding: 0.6rem 0.8rem; margin-top: 0.5rem; }
+.ms-ts-row { display: flex; justify-content: space-between; font-size: 0.78rem; padding: 0.22rem 0; }
+.ms-ts-row span:first-child { color: var(--text-lo); }
+.ms-ts-row strong { font-family: var(--font-num); color: var(--text-hi); }
+.ms-trade-submit-btn { width: 100%; padding: 0.72rem; border: none; border-radius: var(--r-sm); font-size: 0.9rem; font-weight: 700; cursor: pointer; transition: all var(--t); margin-top: 0.75rem; }
+.ms-trade-submit-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.ms-trade-disclaimer { font-size: 0.68rem; color: var(--text-dim); text-align: center; margin-top: 0.5rem; }
+.ms-trade-empty { padding: 3rem 1.5rem; text-align: center; color: var(--text-lo); background: var(--surface-1); border: 1px solid var(--border-dim); border-radius: var(--r); }
+
+/* Tab bar (portfolio) */
+.ms-tab-bar { display: flex; border-bottom: 1px solid var(--border-dim); margin-bottom: 1rem; }
+.ms-tab-btn { padding: 0.5rem 1rem; background: none; border: none; border-bottom: 2px solid transparent; color: var(--text-lo); font-size: 0.82rem; font-weight: 500; cursor: pointer; transition: all var(--t); }
+.ms-tab-btn:hover { color: var(--text); }
+.ms-tab-btn.active { color: var(--text-hi); border-bottom-color: var(--blue); }
+
+/* ── Portfolio page ────────────────────────────────────────────────────── */
+.ms-portfolio-page { }
+.ms-portfolio-header { background: var(--surface-1); border: 1px solid var(--border-dim); border-radius: var(--r); padding: 1.25rem 1.4rem; margin-bottom: 1.25rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+.ms-ph-main   { }
+.ms-ph-label  { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-lo); margin-bottom: 0.25rem; }
+.ms-ph-equity { font-family: var(--font-num); font-size: 2rem; font-weight: 700; color: var(--text-hi); letter-spacing: -0.04em; }
+.ms-ph-ret    { font-family: var(--font-num); font-size: 0.9rem; font-weight: 600; margin-top: 0.2rem; }
+.ms-ph-ret.pos { color: var(--green); }
+.ms-ph-ret.neg { color: var(--red); }
+.ms-ph-stats  { display: flex; gap: 1.5rem; flex-wrap: wrap; }
+.ms-ph-stat   { text-align: right; }
+.ms-ph-sl     { font-family: var(--font-num); font-size: 1rem; font-weight: 600; color: var(--text-hi); }
+.ms-ph-slabel { font-size: 0.68rem; color: var(--text-lo); margin-top: 0.1rem; }
+.ms-portfolio-body { display: grid; grid-template-columns: 1fr 240px; gap: 1rem; align-items: start; }
+@media (max-width: 820px) { .ms-portfolio-body { grid-template-columns: 1fr; } }
+.ms-portfolio-main { }
+.ms-portfolio-side { }
+.ms-alloc-legend { margin-top: 0.75rem; display: flex; flex-direction: column; gap: 0.3rem; }
+.ms-alloc-row  { display: flex; align-items: center; gap: 0.5rem; font-size: 0.76rem; }
+.ms-alloc-dot  { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.ms-alloc-name { flex: 1; color: var(--text); }
+.ms-alloc-pct  { font-family: var(--font-num); color: var(--text-lo); }
+
+/* ── Leaderboard page ──────────────────────────────────────────────────── */
+.ms-leaderboard-page { }
+.ms-my-standing {
+  display: flex; align-items: center; gap: 1rem;
+  background: linear-gradient(135deg, rgba(74,158,255,0.08), rgba(139,125,255,0.06));
+  border: 1px solid rgba(74,158,255,0.25); border-radius: var(--r);
+  padding: 1.1rem 1.4rem; margin-bottom: 1.25rem;
+}
+.ms-ms-rank   { font-family: var(--font-num); font-size: 2rem; font-weight: 700; color: var(--blue); flex-shrink: 0; }
+.ms-ms-label  { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-lo); }
+.ms-ms-equity { font-family: var(--font-num); font-size: 1rem; font-weight: 600; color: var(--text-hi); margin-top: 0.1rem; }
+.ms-ms-ret    { font-family: var(--font-num); font-size: 1.15rem; font-weight: 700; margin-left: auto; flex-shrink: 0; }
+.ms-ms-ret.pos { color: var(--green); }
+.ms-ms-ret.neg { color: var(--red); }
+.ms-lb-table-wrap { background: var(--surface-1); border: 1px solid var(--border-dim); border-radius: var(--r); overflow: hidden; }
+.ms-lb-table { width: 100%; }
+.ms-lb-me-row td { background: rgba(74,158,255,0.05) !important; }
+.ms-lb-rank-cell { font-size: 1rem; }
+.ms-lb-footer { margin-top: 0.75rem; font-size: 0.72rem; color: var(--text-dim); text-align: center; padding: 0.5rem; }
+
+/* ── Rules page ────────────────────────────────────────────────────────── */
+.ms-rules-page { }
+.ms-rule-section { margin-bottom: 1.1rem; }
+.ms-rule-section:last-of-type { margin-bottom: 0; }
+.ms-rule-section-label { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.09em; color: var(--text-lo); margin-bottom: 0.6rem; padding-bottom: 0.4rem; border-bottom: 1px solid var(--border-dim); }
+.ms-rule-row   { display: flex; justify-content: space-between; align-items: flex-start; padding: 0.55rem 0; border-bottom: 1px solid var(--border-dim); gap: 1rem; }
+.ms-rule-row:last-child { border-bottom: none; }
+.ms-rule-label { font-size: 0.82rem; color: var(--text); font-weight: 500; }
+.ms-rule-note  { font-size: 0.72rem; color: var(--text-lo); margin-top: 0.2rem; }
+.ms-rule-value { font-family: var(--font-num); font-size: 0.82rem; color: var(--text-hi); text-align: right; flex-shrink: 0; }
+.ms-rules-disclaimer { margin-top: 1.25rem; padding: 0.75rem; background: var(--amber-dim); border: 1px solid rgba(240,183,50,0.2); border-radius: var(--r-sm); font-size: 0.75rem; color: #c9922a; line-height: 1.6; }

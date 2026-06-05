@@ -10,7 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.config import get_settings
 from app.database import init_db
 from app.api import health, smart_money, backtest, simulation, improvement
-from app.api import human_sim, agent
+from app.api import human_sim, agent, market, sim_games, sim_trading
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -38,8 +38,11 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:5173",
+        "http://localhost:5174",
+        "http://localhost:5175",
         "http://localhost:3000",
         "http://127.0.0.1:5173",
+        "http://127.0.0.1:5174",
         "http://127.0.0.1:3000",
     ],
     allow_credentials=True,
@@ -54,6 +57,9 @@ app.include_router(simulation.router, prefix="/api/simulation")
 app.include_router(improvement.router, prefix="/api/improvement")
 app.include_router(human_sim.router, prefix="/api/sim")
 app.include_router(agent.router, prefix="/api/agent")
+app.include_router(market.router, prefix="/api/market", tags=["market"])
+app.include_router(sim_games.router, prefix="/api/ms", tags=["market-sim"])
+app.include_router(sim_trading.router, prefix="/api/ms", tags=["market-sim"])
 
 
 @app.get("/")

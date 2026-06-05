@@ -6,6 +6,14 @@ import Simulation from './pages/Simulation'
 import ImprovementLog from './pages/ImprovementLog'
 import HumanSimulator from './pages/HumanSimulator'
 import LearningEnginePage from './pages/LearningEngine'
+import SimulatorLanding from './pages/simulator/Landing'
+import CreateGame from './pages/simulator/CreateGame'
+import GameLayout from './pages/simulator/GameLayout'
+import GameOverview from './pages/simulator/GameOverview'
+import TradePage from './pages/simulator/TradePage'
+import PortfolioPage from './pages/simulator/PortfolioPage'
+import LeaderboardPage from './pages/simulator/LeaderboardPage'
+import RulesPage from './pages/simulator/RulesPage'
 
 function Nav() {
   return (
@@ -20,7 +28,8 @@ function Nav() {
           ['/backtest', 'Backtest'],
           ['/simulation', 'Simulation'],
           ['/improvement', 'Improvement Log'],
-          ['/simulator', 'Simulator'],
+          ['/market-sim', 'Market Sim'],
+          ['/paper-trading', 'Paper Trading'],
           ['/learning', 'Learning Engine'],
         ] as [string, string][]
       ).map(([to, label]) => (
@@ -61,12 +70,24 @@ export default function App() {
         <main className="main" role="main">
           <ErrorBoundary>
             <Routes>
+              {/* Original EdgeCheck pages */}
               <Route path="/" element={<SmartMoney />} />
               <Route path="/backtest" element={<Backtest />} />
               <Route path="/simulation" element={<Simulation />} />
               <Route path="/improvement" element={<ImprovementLog />} />
-              <Route path="/simulator" element={<HumanSimulator />} />
+              <Route path="/paper-trading" element={<HumanSimulator />} />
               <Route path="/learning" element={<LearningEnginePage />} />
+
+              {/* Market Simulator */}
+              <Route path="/market-sim" element={<SimulatorLanding />} />
+              <Route path="/market-sim/create" element={<CreateGame />} />
+              <Route path="/market-sim/game/:gameId" element={<GameLayout />}>
+                <Route index element={<GameOverview />} />
+                <Route path="trade"       element={<TradePage />} />
+                <Route path="portfolio"   element={<PortfolioPage />} />
+                <Route path="leaderboard" element={<LeaderboardPage />} />
+                <Route path="rules"       element={<RulesPage />} />
+              </Route>
             </Routes>
           </ErrorBoundary>
         </main>
